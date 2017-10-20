@@ -1,0 +1,8 @@
+{
+  "name": "ccmbenchmark/tinggenerator",
+  "description": "Generate entities and repositories for Ting",
+  "require": {
+    "php": ">=5.5",
+    "zendframework/zend-code": "^3.1"
+  }
+}
