@@ -1,0 +1,1 @@
+Generate entities et repositories for Ting.
