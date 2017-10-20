@@ -20,53 +20,41 @@ $fieldTypeMapping = new FieldTypeMapping();
 $string = new StringFormatter();
 
 $logger->info('Loading configuration');
+$conf = simplexml_load_file('./conf.xml');
 
-$conf = require __DIR__ . '/conf.php';
-foreach ($conf as $dataSource) {
+foreach ($conf->data_source as $dataSource) {
+
+    $dataSourceAttributes = $dataSource->attributes();
 
     $logger->info('Connecting to data source');
     $pdo = new PDO(
         sprintf(
             '%s:host=%s;port:%s;dbname=%s;charset=%s',
-            $dataSource['type'],
-            $dataSource['host'],
-            $dataSource['port'],
-            $dataSource['dbname'],
-            $dataSource['charset']
+            $dataSourceAttributes->type,
+            $dataSourceAttributes->host,
+            $dataSourceAttributes->port,
+            $dataSourceAttributes->dbname,
+            $dataSourceAttributes->charset
         ),
-        $dataSource['username'],
-        $dataSource['password']
+        $dataSourceAttributes->username,
+        $dataSourceAttributes->password
     );
 
-    $query = $pdo->query(sprintf('SHOW TABLES FROM %s', $dataSource['dbname']));
-    foreach ($query->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        /**
-         * Handle exclude filter
-         */
-        if (isset($dataSource['excludeTableFilter']) === true
-            && is_callable($dataSource['excludeTableFilter']) === true) {
-            if ($dataSource['excludeTableFilter']($row['Tables_in_auth_ccm_net']) === true) {
-                continue;
-            }
-        }
+    foreach ($dataSource->generate as $generate) {
 
-        $query2 = $pdo->query(
-            sprintf('DESCRIBE `%s`.`%s`', $dataSource['dbname'], $row['Tables_in_auth_ccm_net'])
-        );
-        $tableDescription = $query2->fetchAll(PDO::FETCH_ASSOC);
+        $generateAttributes = $generate->attributes();
 
-        if (isset($dataSource['entityNameFormatter']) === true
-            && is_callable($dataSource['entityNameFormatter']) === true) {
-            $entityName = $dataSource['entityNameFormatter']($row['Tables_in_auth_ccm_net']);
-        } else {
-            $entityName = ucfirst($row['Tables_in_auth_ccm_net']);
-        }
+        $query = $pdo->query(sprintf(
+            'DESCRIBE `%s`.`%s`',
+            $dataSourceAttributes->dbname,
+            $generateAttributes->from_table
+         ));
+        $tableDescription = $query->fetchAll(PDO::FETCH_ASSOC);
 
         $logger->info('Writing class');
         $classGenerator = new ClassGenerator();
         $classGenerator
-            ->setName($entityName)
-            ->setNamespaceName($dataSource['entityNamespace'])
+            ->setName($generateAttributes->with_namespace . '\\' . $generateAttributes->entity)
             ->addUse('CCMBenchmark\\Ting\\Entity\\NotifyPropertyInterface')
             ->addUse('CCMBenchmark\\Ting\\Entity\\NotifyProperty')
             ->setImplementedInterfaces(['CCMBenchmark\\Ting\\Entity\\NotifyPropertyInterface'])
@@ -86,13 +74,13 @@ foreach ($conf as $dataSource) {
             $classGenerator
                 ->addPropertyFromGenerator(
                     PropertyGenerator::fromArray([
-                     'name'         => $propertyName,
-                     'defaultValue' => null, //@todo: handle custom default value
-                     'visibility'   => PropertyGenerator::VISIBILITY_PRIVATE,
-                     'docblock'     => DocBlockGenerator::fromArray([
-                            'tags'         => [new GenericTag('var', $fieldTypeString)]
+                        'name'         => $propertyName,
+                        'defaultValue' => null, //@todo: handle custom default value
+                        'visibility'   => PropertyGenerator::VISIBILITY_PRIVATE,
+                        'docblock'     => DocBlockGenerator::fromArray([
+                        'tags'         => [new GenericTag('var', $fieldTypeString)]
                         ])
-                    ])
+                     ])
                 );
 
             $logger->info('Writing setter for property: \'' . $propertyName . '\'');
@@ -118,55 +106,54 @@ foreach ($conf as $dataSource) {
             $classGenerator
                 ->addMethodFromGenerator(
                     MethodGenerator::fromArray([
-                       'name'       => 'set' . $propertyNameForMethod,
-                       'parameters' => [$propertyName],
-                       'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
-                       'body'       => $body,
-                       'docblock'   => DocBlockGenerator::fromArray([
-                            'tags' => [
-                                new ParamTag($propertyName, [$fieldType]),
-                                new ReturnTag(['$this'])
-                            ]
-                        ])
-                   ])
-                );
+                        'name'       => 'set' . $propertyNameForMethod,
+                        'parameters' => [$propertyName],
+                        'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
+                        'body'       => $body,
+                        'docblock'   => DocBlockGenerator::fromArray([
+                        'tags' => [
+                            new ParamTag($propertyName, [$fieldType]),
+                            new ReturnTag(['$this'])
+                        ]
+                    ])
+                ])
+            );
 
             $logger->info('Writing getter for property: \'' . $propertyName . '\'');
 
             $cast = '';
-            if ($fieldType === FieldTypeMapping::TYPE_STRING || $fieldType === FieldTypeMapping::TYPE_INT) {
+            if ($fieldType === FieldTypeMapping::TYPE_STRING || $fieldType === FieldTypeMapping::TYPE_STRING) {
                 $cast = ' (' . $fieldType . ')';
             }
 
             $classGenerator
                 ->addMethodFromGenerator(
                     MethodGenerator::fromArray([
-                       'name'       => 'get' . $propertyNameForMethod,
-                       'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
-                       'body'       => 'return' . $cast . ' $this->' . $propertyName . ';',
-                       'docblock'   => DocBlockGenerator::fromArray([
-                            'tags'       => [new ReturnTag([$fieldType])]
-                        ])
-                   ])
-                );
+                        'name'       => 'get' . $propertyNameForMethod,
+                        'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
+                        'body'       => 'return' . $cast . ' $this->' . $propertyName . ';',
+                        'docblock'   => DocBlockGenerator::fromArray([
+                        'tags'       => [new ReturnTag([$fieldType])]
+                    ])
+                ])
+            );
         }
         $logger->info('Class generated !');
 
         $fileGenerator = new FileGenerator();
         $fileGenerator->setClass($classGenerator);
 
-        $directory = $dataSource['entitiesDirectory'];
+        $directory = __DIR__ . 'generate.php/' . str_replace('\\', '/', $generateAttributes->with_namespace);
         if (is_dir($directory) === false) {
             mkdir($directory, 0777, true);
         }
 
-        $filename = $directory . '/' . $entityName . '.php';
+        $filename = $directory . '/' . $generateAttributes->entity . '.php';
 
         $logger->info('Writing file ' . $filename);
 
         file_put_contents($filename, $fileGenerator->generate());
     }
 }
-
 
 $logger->info('Done');
