@@ -64,6 +64,20 @@ class Configuration
     }
 
     /**
+     * @param string $parameterName
+     *
+     * @return mixed
+     */
+    private function getParameter($parameterName)
+    {
+        if (isset($this->configurationData[$parameterName]) === false) {
+            return null;
+        }
+
+        return $this->configurationData[$parameterName];
+    }
+
+    /**
      * @return string
      */
     public function getDataSourceType()
@@ -117,5 +131,19 @@ class Configuration
     public function getPassword()
     {
         return (string) $this->getMandatoryParameter('password');
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getExcludedTablesFilter()
+    {
+        $excludedTablesFilter = $this->getParameter('excludedTablesFilter');
+        if (is_callable($excludedTablesFilter) === false) {
+            $this->logger->warning('Parameter \'excludedTablesFilter\' is defined but must be a callable.');
+            return null;
+        }
+
+        return $excludedTablesFilter;
     }
 }
