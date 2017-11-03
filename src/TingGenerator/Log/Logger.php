@@ -31,7 +31,7 @@ class Logger
      */
     public function error($message)
     {
-        echo "\033[31m $message \033[0m";
+        echo "\n\033[31m $message \033[0m";
     }
 
     /**
@@ -39,7 +39,7 @@ class Logger
      */
     public function warning($message)
     {
-        echo "\033[33m $message \033[0m";
+        echo "\n\033[33m $message \033[0m";
     }
 
     /**
@@ -47,6 +47,6 @@ class Logger
      */
     public function info($message)
     {
-        echo "\033[36m $message \033[0m";
+        echo "\n\033[36m $message \033[0m";
     }
 }
