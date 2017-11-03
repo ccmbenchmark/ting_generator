@@ -9,7 +9,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use CCMBenchmark\TingGenerator\Entity\Generator;
+use CCMBenchmark\TingGenerator\Generator\Entity;
 use CCMBenchmark\TingGenerator\FileGeneration\ClassWriter;
 use CCMBenchmark\TingGenerator\Infrastructure\StringFormatter;
 use CCMBenchmark\TingGenerator\Log\Logger;
@@ -28,7 +28,7 @@ class GenerateEntitiesCommand extends Command
     private $logger;
 
     /**
-     * @var Generator
+     * @var Entity
      */
     private $entityGenerator;
 
@@ -72,7 +72,7 @@ class GenerateEntitiesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->logger = new Logger($output);
-        $this->entityGenerator = new Generator(new ClassGenerator(), $this->logger, new StringFormatter());
+        $this->entityGenerator = new Entity(new ClassGenerator(), $this->logger, new StringFormatter());
         $this->classWriter = new ClassWriter(new FileGenerator(), $this->logger);
 
         $confArgument = $input->getArgument('conf');

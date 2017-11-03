@@ -1,6 +1,6 @@
 <?php
 
-namespace CCMBenchmark\TingGenerator\Entity;
+namespace CCMBenchmark\TingGenerator\Generator;
 
 class PropertyData
 {

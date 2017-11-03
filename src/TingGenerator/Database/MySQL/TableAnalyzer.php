@@ -2,7 +2,7 @@
 
 namespace CCMBenchmark\TingGenerator\Database\MySQL;
 
-use CCMBenchmark\TingGenerator\Entity\PropertyData;
+use CCMBenchmark\TingGenerator\Generator\PropertyData;
 use CCMBenchmark\TingGenerator\Log\Logger;
 
 class TableAnalyzer

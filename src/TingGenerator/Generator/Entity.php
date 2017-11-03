@@ -22,7 +22,7 @@
  *
  **********************************************************************/
 
-namespace CCMBenchmark\TingGenerator\Entity;
+namespace CCMBenchmark\TingGenerator\Generator;
 
 use CCMBenchmark\TingGenerator\Infrastructure\PHPType;
 use CCMBenchmark\TingGenerator\Log\Logger;
@@ -36,7 +36,7 @@ use Zend\Code\Generator\Exception\InvalidArgumentException;
 use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\PropertyGenerator;
 
-class Generator
+class Entity
 {
     /**
      * @var ClassGenerator
