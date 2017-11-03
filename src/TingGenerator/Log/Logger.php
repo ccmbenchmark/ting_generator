@@ -24,14 +24,30 @@
 
 namespace CCMBenchmark\TingGenerator\Log;
 
+use Symfony\Component\Console\Output\OutputInterface;
+
 class Logger
 {
+    /**
+     * @var OutputInterface
+     */
+    private $output;
+
+    /**
+     * Logger constructor.
+     * @param OutputInterface $output
+     */
+    public function __construct(OutputInterface $output)
+    {
+        $this->output = $output;
+    }
+
     /**
      * @param string $message
      */
     public function error($message)
     {
-        echo "\n\033[31m $message \033[0m";
+        echo $this->output->writeln('<error>' . $message . '</error>');
     }
 
     /**
@@ -39,7 +55,7 @@ class Logger
      */
     public function warning($message)
     {
-        echo "\n\033[33m $message \033[0m";
+        echo $this->output->writeln('<warning>' . $message . '</warning>');
     }
 
     /**
@@ -47,6 +63,6 @@ class Logger
      */
     public function info($message)
     {
-        echo "\n\033[36m $message \033[0m";
+        echo $this->output->writeln('<info>' . $message . '</info>');
     }
 }

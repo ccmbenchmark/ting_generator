@@ -62,7 +62,7 @@ class GenerateEntitiesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->logger = new Logger();
+        $this->logger = new Logger($output);
         $this->entityGenerator = new Generator(new ClassGenerator(), $this->logger, new StringFormatter());
         $this->classWriter = new ClassWriter(new FileGenerator(), $this->logger);
 
