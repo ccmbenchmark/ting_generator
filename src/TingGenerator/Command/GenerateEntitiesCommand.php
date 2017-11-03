@@ -59,7 +59,16 @@ class GenerateEntitiesCommand extends Command
             ->addArgument('conf', InputArgument::REQUIRED, 'Full path to configuration file');
     }
 
-
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     *
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
+     * @throws \Zend\Code\Generator\Exception\RuntimeException
+     *
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->logger = new Logger($output);
@@ -71,15 +80,14 @@ class GenerateEntitiesCommand extends Command
         $this->configuration = $this->getConfiguration($confArgument);
         if ($this->configuration === null) {
             $this->logger->error('Configuration file not found: ' . $confArgument);
-            exit;
+            return 1;
         }
 
         $tablesData = $this->getTablesData();
         if ($tablesData === null) {
             $this->logger->error('Unable to read data source and retrieve table data');
-            exit;
+            return 1;
         }
-
 
         $this->entityNameFormatter = $this->configuration->getEntityNameFormatter();
 
@@ -87,6 +95,8 @@ class GenerateEntitiesCommand extends Command
             $this->logger->info('----------------------------------------------');
             $this->generateEntity($tableName, $this->configuration->getEntityNamespace(), $tableData);
         }
+
+        return 1;
     }
 
     /**
