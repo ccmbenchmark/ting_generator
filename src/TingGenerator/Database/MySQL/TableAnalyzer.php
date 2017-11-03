@@ -84,7 +84,7 @@ class TableAnalyzer
                 continue;
             }
 
-            $tablesDataList[$key] = $this->getTableData($row[$key]);
+            $tablesDataList[$row[$key]] = $this->getTableData($row[$key]);
         }
 
         return $tablesDataList;
