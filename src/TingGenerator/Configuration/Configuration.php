@@ -168,4 +168,12 @@ class Configuration
 
         return $entityNameFormatter;
     }
+
+    /**
+     * @return string
+     */
+    public function getEntityDirectory()
+    {
+        return (string) $this->getMandatoryParameter('entitiesDirectory');
+    }
 }
