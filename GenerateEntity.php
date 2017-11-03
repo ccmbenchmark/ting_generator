@@ -45,11 +45,12 @@ class GenerateEntity
 
     /**
      * GenerateEntity constructor.
-     * @param Logger $logger
      */
-    public function __construct(Logger $logger)
+    public function __construct()
     {
-        $this->logger = $logger;
+        $this->logger = new Logger();
+        $this->entityGenerator = new Generator(new ClassGenerator(), $this->logger, new StringFormatter());
+        $this->classWriter = new ClassWriter(new FileGenerator(), $this->logger);
     }
 
     /**
@@ -70,8 +71,7 @@ class GenerateEntity
             exit;
         }
 
-        $this->classWriter = new ClassWriter(new FileGenerator(), $this->logger);
-        $this->entityGenerator = new Generator(new ClassGenerator(), new Logger(), new StringFormatter());
+
         $this->entityNameFormatter = $this->configuration->getEntityNameFormatter();
 
         foreach ($tablesData as $tableName => $tableData) {
@@ -166,5 +166,5 @@ class GenerateEntity
     }
 }
 
-$generateEntity = new GenerateEntity(new Logger());
+$generateEntity = new GenerateEntity();
 $generateEntity->execute();
