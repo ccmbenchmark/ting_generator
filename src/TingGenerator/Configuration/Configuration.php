@@ -146,4 +146,26 @@ class Configuration
 
         return $excludedTablesFilter;
     }
+
+    /**
+     * @return string
+     */
+    public function getEntityNamespace()
+    {
+        return (string) $this->getParameter('entityNamespace');
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getEntityNameFormatter()
+    {
+        $entityNameFormatter = $this->getParameter('entityNameFormatter');
+        if (is_callable($entityNameFormatter) === false) {
+            $this->logger->warning('Parameter \'entityNameFormatter\' is defined but must be a callable.');
+            return null;
+        }
+
+        return $entityNameFormatter;
+    }
 }
