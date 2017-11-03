@@ -73,6 +73,9 @@ class Generator
     }
 
     /**
+     * Class generator must be cleaned before each generation.
+     * Else it gonna keep in memory the previous generated class.
+     *
      * @return $this
      */
     private function initializeClassGenerator()
