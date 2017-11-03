@@ -1,6 +1,6 @@
 <?php
 /**
- * php application.php generate:entities --
+ * sudo -E php application.php generate:entities /var/www/ting_generator/conf.php
  */
 
 namespace CCMBenchmark\TingGenerator\Command;
