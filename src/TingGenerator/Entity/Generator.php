@@ -41,6 +41,11 @@ class Generator
     /**
      * @var ClassGenerator
      */
+    private $baseClassGenerator;
+
+    /**
+     * @var ClassGenerator
+     */
     private $classGenerator;
 
     /**
@@ -61,9 +66,20 @@ class Generator
      */
     public function __construct(ClassGenerator $classGenerator, Logger $logger, StringFormatter $stringFormatter)
     {
-        $this->classGenerator = $classGenerator;
+        $this->baseClassGenerator = $classGenerator;
         $this->logger = $logger;
         $this->stringFormatter = $stringFormatter;
+        $this->initializeClassGenerator();
+    }
+
+    /**
+     * @return $this
+     */
+    private function initializeClassGenerator()
+    {
+        $this->classGenerator = clone $this->baseClassGenerator;
+
+        return $this;
     }
 
     /**
@@ -84,6 +100,7 @@ class Generator
     public function generateEntityCode($entityName, $namespace, array $entityDescription)
     {
         $this
+            ->initializeClassGenerator()
             ->generateClassHead($entityName, $namespace)
             ->generateClassBody($entityDescription);
 
@@ -148,7 +165,7 @@ class Generator
             $this->classGenerator
                 ->addPropertyFromGenerator(
                     PropertyGenerator::fromArray([
-                        'name' => lcfirst($propertyData->getName()),
+                        'name' => lcfirst($this->stringFormatter->camelize($propertyData->getName())),
                         'defaultValue' => null, // @todo: handle default value for property
                         'visibility' => PropertyGenerator::VISIBILITY_PRIVATE,
                         'docblock' => DocBlockGenerator::fromArray([
@@ -158,7 +175,6 @@ class Generator
                 );
         } catch (InvalidArgumentException $exception) {
             $this->logger->error($exception->getMessage());
-            return $this;
         }
 
         return $this;
@@ -172,32 +188,33 @@ class Generator
     private function addSetterForProperty(PropertyData $propertyData)
     {
         $setterBody = '';
-        $propertyName = $propertyData->getName();
-        $varName = '$' . $propertyName;
+        $propertyName = $this->formatPropertyName($propertyData->getName());
+        $parameterName = '$' . $propertyName;
         $propertyType = $propertyData->getType();
 
         if ($this->shouldCloneProperty($propertyType) === true) {
-            $setterBody .= '$clone = clone ' . $varName . ';' . "\n";
-            $varName = '$clone';
+            $setterBody .= '$clone = clone ' . $parameterName . ';' . "\n";
+            $parameterName = '$clone';
         }
 
         if ($this->shouldCastProperty($propertyType) === true) {
-            $setterBody .= $varName . ' = (' . $propertyType . ') ' . $varName . ';' . "\n";
+            $setterBody .= $parameterName . ' = (' . $propertyType . ') ' . $parameterName . ';' . "\n";
         }
 
-        $setterBody .= '$this->propertyChanged(\'' . $propertyName . '\', $this->' . $propertyName . ', ' . $varName . ');'
+        $setterBody .= '$this->propertyChanged(\'' . $propertyName . '\', $this->' . $propertyName . ', ' . $parameterName . ');'
             . "\n"
-            . '$this->' . $propertyName . ' = ' . $varName . ';'
+            . '$this->' . $propertyName . ' = ' . $parameterName . ';'
             . "\n"
             . "\n"
             . 'return $this;';
 
+        $methodName = 'set' . ucfirst($propertyName);
         try {
             $this->classGenerator
                 ->addMethodFromGenerator(
                     MethodGenerator::fromArray([
-                        'name'       => 'set' . $propertyName,
-                        'parameters' => lcfirst($propertyName),
+                        'name'       => $methodName,
+                        'parameters' => [$propertyName],
                         'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
                         'body'       => $setterBody,
                         'docblock'   => DocBlockGenerator::fromArray([
@@ -209,8 +226,9 @@ class Generator
                     ])
                 );
         } catch (InvalidArgumentException $exception) {
-            $this->logger->error($exception->getMessage());
-            return $this;
+            $this->logger->error(
+                'Unable to generate setter "' . $methodName . '". ' . $exception->getMessage()
+            );
         }
 
         return $this;
@@ -224,28 +242,30 @@ class Generator
     private function addGetterForProperty(PropertyData $propertyData)
     {
         $propertyType = $propertyData->getType();
-        $propertyName = $propertyData->getName();
+        $propertyName = $this->formatPropertyName($propertyData->getName());
         $getterBody = 'return';
         if ($this->shouldCastProperty($propertyType) === true) {
             $getterBody .= ' (' . $propertyType . ')';
         }
-        $getterBody .= ' $this->' . lcfirst($propertyName) . ';';
+        $getterBody .= ' $this->' . $propertyName . ';';
 
+        $methodName = 'get' . ucfirst($propertyName);
         try {
-        $this->classGenerator
-            ->addMethodFromGenerator(
-                MethodGenerator::fromArray([
-                    'name' => 'get',
-                    'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
-                    'body' => $getterBody,
-                    'docblock' => DocBlockGenerator::fromArray([
-                        'tags' => new ReturnTag([$propertyType])
+            $this->classGenerator
+                ->addMethodFromGenerator(
+                    MethodGenerator::fromArray([
+                        'name' => $methodName,
+                        'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
+                        'body' => $getterBody,
+                        'docblock' => DocBlockGenerator::fromArray([
+                            'tags' => [new ReturnTag([$propertyType])]
+                        ])
                     ])
-                ])
-            );
+                );
         } catch (InvalidArgumentException $exception) {
-            $this->logger->error($exception->getMessage());
-            return $this;
+            $this->logger->error(
+                'Unable to generate getter "' . $methodName . '". ' . $exception->getMessage()
+            );
         }
 
         return $this;
@@ -269,5 +289,15 @@ class Generator
     private function shouldCastProperty($propertyType)
     {
         return $propertyType === PHPType::TYPE_STRING || $propertyType === PHPType::TYPE_INT;
+    }
+
+    /**
+     * @param string $propertyName
+     *
+     * @return string
+     */
+    private function formatPropertyName($propertyName)
+    {
+        return lcfirst($this->stringFormatter->camelize($propertyName));
     }
 }
