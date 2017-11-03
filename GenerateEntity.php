@@ -6,6 +6,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/autoload.php';
 
 use CCMBenchmark\TingGenerator\Entity\Generator;
+use CCMBenchmark\TingGenerator\FileGeneration\ClassWriter;
 use CCMBenchmark\TingGenerator\Infrastructure\StringFormatter;
 use CCMBenchmark\TingGenerator\Log\Logger;
 use CCMBenchmark\TingGenerator\Configuration\ConfigurationLoader;
@@ -38,9 +39,9 @@ class GenerateEntity
     private $configuration;
 
     /**
-     * @var FileGenerator
+     * @var ClassWriter
      */
-    private $fileGenerator;
+    private $classWriter;
 
     /**
      * GenerateEntity constructor.
@@ -69,7 +70,7 @@ class GenerateEntity
             exit;
         }
 
-        $this->fileGenerator = new FileGenerator();
+        $this->classWriter = new ClassWriter(new FileGenerator(), $this->logger);
         $this->entityGenerator = new Generator(new ClassGenerator(), new Logger(), new StringFormatter());
         $this->entityNameFormatter = $this->configuration->getEntityNameFormatter();
 
@@ -161,26 +162,7 @@ class GenerateEntity
 
         $this->logger->info('... in directory: ' . $entityDirectory);
 
-        if (is_dir($entityDirectory) === false) {
-            $this->logger->info('Creating directory: ' . $entityDirectory);
-            if (mkdir($entityDirectory, 0777, true) === false) {
-                $this->logger->error('Unable to write directory: ' . $entityDirectory);
-                return false;
-            }
-        }
-
-        $fileGenerator = new FileGenerator();
-        $fileGenerator->setClass($classGenerator);
-
-        $filename = $entityDirectory . '/' . $entityName . '.php';
-        if (file_put_contents($filename, $fileGenerator->generate()) === false) {
-            $this->logger->error('Error when writing "' . $filename . '"');
-            return false;
-        }
-
-        $this->logger->info('Entity written in: ' . $filename);
-
-        return true;
+        return $this->classWriter->write($entityName, $classGenerator, $entityDirectory);
     }
 }
 
