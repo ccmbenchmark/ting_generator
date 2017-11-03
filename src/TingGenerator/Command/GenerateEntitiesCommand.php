@@ -1,10 +1,14 @@
 <?php
+/**
+ * php application.php generate:entities --
+ */
 
-namespace CCMBenchmark\TingGenerator;
+namespace CCMBenchmark\TingGenerator\Command;
 
-require_once __DIR__ . '/vendor/autoload.php';
-require_once __DIR__ . '/autoload.php';
-
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use CCMBenchmark\TingGenerator\Entity\Generator;
 use CCMBenchmark\TingGenerator\FileGeneration\ClassWriter;
 use CCMBenchmark\TingGenerator\Infrastructure\StringFormatter;
@@ -16,7 +20,7 @@ use CCMBenchmark\TingGenerator\Database\MySQL\TypeMapping;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\FileGenerator;
 
-class GenerateEntity
+class GenerateEntitiesCommand extends Command
 {
     /**
      * @var Logger
@@ -44,24 +48,29 @@ class GenerateEntity
     private $classWriter;
 
     /**
-     * GenerateEntity constructor.
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws \Symfony\Component\Console\Exception\LogicException
      */
-    public function __construct()
+    protected function configure()
+    {
+        $this
+            ->setName('generate:entities')
+            ->setDescription('Generate your entities')
+            ->addArgument('conf', InputArgument::REQUIRED, 'Full path to configuration file');
+    }
+
+
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->logger = new Logger();
         $this->entityGenerator = new Generator(new ClassGenerator(), $this->logger, new StringFormatter());
         $this->classWriter = new ClassWriter(new FileGenerator(), $this->logger);
-    }
 
-    /**
-     * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
-     * @throws \Zend\Code\Generator\Exception\RuntimeException
-     */
-    public function execute()
-    {
-        $this->configuration = $this->getConfiguration(__DIR__ . '/conf.php');
+        $confArgument = $input->getArgument('conf');
+
+        $this->configuration = $this->getConfiguration($confArgument);
         if ($this->configuration === null) {
-            $this->logger->error('Configuration file not found');
+            $this->logger->error('Configuration file not found: ' . $confArgument);
             exit;
         }
 
@@ -133,8 +142,8 @@ class GenerateEntity
 
         $classGenerator = $this
             ->entityGenerator
-                ->generateEntityCode($entityNameFormatted, $entityNamespace, $tableData)
-                ->getClassGenerator();
+            ->generateEntityCode($entityNameFormatted, $entityNamespace, $tableData)
+            ->getClassGenerator();
 
         return $this->writeEntity($entityNameFormatted, $classGenerator);
     }
@@ -156,7 +165,7 @@ class GenerateEntity
         if ($entityDirectory === '') {
             $this
                 ->logger
-                    ->error('You must specify a repository for generated entities. See entitiesDirectory in conf.');
+                ->error('You must specify a repository for generated entities. See entitiesDirectory in conf.');
             return false;
         }
 
@@ -165,6 +174,3 @@ class GenerateEntity
         return $this->classWriter->write($entityName, $classGenerator, $entityDirectory);
     }
 }
-
-$generateEntity = new GenerateEntity();
-$generateEntity->execute();
