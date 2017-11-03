@@ -36,8 +36,8 @@ return [
     /**
      * Where files will be written
      */
-    'entitiesDirectory'       => '/var/www/POCTingGenerate/AppBundle/Domain/Entity',
-    'repositoriesDirectory'   => '/var/www/POCTingGenerate/AppBundle/Infrastructure/Repository',
+    'entitiesDirectory'       => '/var/www/ting_generator/generated/AppBundle/Domain/Entity',
+    'repositoriesDirectory'   => '/var/www/ting_generator/generated/AppBundle/Infrastructure/Repository',
 
     /**
      * Namespaces
