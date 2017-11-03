@@ -4,10 +4,16 @@ namespace CCMBenchmark\TingGenerator\FileGeneration;
 
 use CCMBenchmark\TingGenerator\Log\Logger;
 use Zend\Code\Generator\ClassGenerator;
+use Zend\Code\Generator\Exception\RuntimeException;
 use Zend\Code\Generator\FileGenerator;
 
 class ClassWriter
 {
+    /**
+     * @var FileGenerator
+     */
+    private $baseFileGenerator;
+
     /**
      * @var FileGenerator
      */
@@ -25,8 +31,21 @@ class ClassWriter
      */
     public function __construct(FileGenerator $fileGenerator, Logger $logger)
     {
-        $this->fileGenerator = $fileGenerator;
+        $this->baseFileGenerator = $fileGenerator;
         $this->logger = $logger;
+    }
+
+    /**
+     * FileGenerator object must be cleaned before each write.
+     * Else it could write a class written previously.
+     *
+     * @return $this
+     */
+    private function initializeFileGenerator()
+    {
+        $this->fileGenerator = clone $this->baseFileGenerator;
+
+        return $this;
     }
 
     /**
@@ -41,6 +60,8 @@ class ClassWriter
      */
     public function write($className, ClassGenerator $classGenerator, $targetDirectory)
     {
+        $this->initializeFileGenerator();
+
         $className = (string) $className;
         $targetDirectory = (string) $targetDirectory;
 
@@ -52,11 +73,14 @@ class ClassWriter
             }
         }
 
+        $filename = $targetDirectory . '/' . $className . '.php';
+        $this->fileGenerator->setFilename($filename);
         $this->fileGenerator->setClass($classGenerator);
 
-        $filename = $targetDirectory . '/' . $className . '.php';
-        if (file_put_contents($filename, $this->fileGenerator->generate()) === false) {
-            $this->logger->error('Error when writing "' . $filename . '"');
+        try {
+            $this->fileGenerator->write();
+        } catch (RuntimeException $exception) {
+            $this->logger->error('Unable to write: ' . $filename . '. Error: ' . $exception->getMessage());
             return false;
         }
 
