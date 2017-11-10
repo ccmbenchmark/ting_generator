@@ -7,6 +7,6 @@ use Symfony\Component\Console\Application;
 
 $application = new Application();
 
-$application->add(new \CCMBenchmark\TingGenerator\Command\GenerateEntitiesCommand());
+$application->add(new \CCMBenchmark\TingGenerator\Command\TingGenerateCommand());
 
 $application->run();
