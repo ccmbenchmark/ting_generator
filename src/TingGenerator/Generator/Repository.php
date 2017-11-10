@@ -193,15 +193,21 @@ class Repository
     private function getFieldDeclarationforInitMetadataFunction(FieldDescription $fieldDescription)
     {
         $fieldName = $fieldDescription->getName();
-        $body =
-            "\n" . '    ->addField(['
-            . "\n" . '        \'fieldName\' => \'' . $fieldName . '\','
+        $body = "\n" . '    ->addField([';
+
+        if ($fieldDescription->isPrimary() === true) {
+            $body .= "\n" . '        \'primary\' => true,';
+        }
+
+        if ($fieldDescription->isAutoIncrement() === true) {
+            $body .= "\n" . '        \'autoincrement\' => true,';
+        }
+
+        $body .=
+              "\n" . '        \'fieldName\' => \'' . $fieldName . '\','
             . "\n" . '        \'columnName\' => \'' . lcfirst($this->stringFormatter->camelize($fieldName)) . '\','
             . "\n" . '        \'type\' => \'' . $fieldDescription->getType() . '\'';
 
-        if ($fieldDescription->isPrimary() === true) {
-            $body .= ',' . "\n" . '        \'primary\' => true';
-        }
         $body .= "\n" . '    ])';
 
         return $body;

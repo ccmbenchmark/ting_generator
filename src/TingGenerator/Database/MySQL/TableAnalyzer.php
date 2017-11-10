@@ -109,7 +109,8 @@ class TableAnalyzer
             $tableData[] = new FieldDescription(
                 $this->typeMapping->getFromMysqlType($row['Type']),
                 $row['Field'],
-                $row['Key'] === 'PRI'
+                $row['Key'] === 'PRI',
+                $row['Extra'] === 'auto_increment'
             );
         }
 
