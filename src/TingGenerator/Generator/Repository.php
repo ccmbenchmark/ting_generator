@@ -2,6 +2,7 @@
 
 namespace CCMBenchmark\TingGenerator\Generator;
 
+use CCMBenchmark\TingGenerator\Database\TableDescription;
 use Zend\Code\Generator\ClassGenerator;
 use CCMBenchmark\TingGenerator\Log\Logger;
 use CCMBenchmark\TingGenerator\Infrastructure\StringFormatter;
@@ -72,8 +73,8 @@ class Repository
 
     /**
      * @param string $repositoryName
-     * @param array $repositoryNamespace
-     * @param array $tableDescription
+     * @param string $repositoryNamespace
+     * @param TableDescription $tableDescription
      * @param string $entityFullQualifiedName
      *
      * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
@@ -83,7 +84,7 @@ class Repository
     public function generateRepositoryCode(
         $repositoryName,
         $repositoryNamespace,
-        array $tableDescription,
+        TableDescription $tableDescription,
         $entityFullQualifiedName
     ) {
         $this
@@ -118,14 +119,14 @@ class Repository
     }
 
     /**
-     * @param array $tableDescription
+     * @param TableDescription $tableDescription
      * @param string $entityFullQualifiedName
      *
      * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
      *
      * @return $this
      */
-    private function generateClassBody(array $tableDescription, $entityFullQualifiedName)
+    private function generateClassBody(TableDescription $tableDescription, $entityFullQualifiedName)
     {
         $this->classGenerator
             ->addMethodFromGenerator(MethodGenerator::fromArray([
@@ -159,26 +160,25 @@ class Repository
     }
 
     /**
-     * @param array $tableDescription
+     * @param TableDescription $tableDescription
      * @param string $entityFullQualifiedName
      * @return string
      */
-    private function getBodyForInitMetadataFunction(array $tableDescription, $entityFullQualifiedName)
+    private function getBodyForInitMetadataFunction(TableDescription $tableDescription, $entityFullQualifiedName)
     {
         $body =
             '$metadata = new Metadata($serializerFactory);'
             . "\n" . '$metadata->setEntity(' . $entityFullQualifiedName . '::class);'
             . "\n" . '$metadata->setConnectionName($options[\'connection\']);'
             . "\n" . '$metadata->setDatabase($options[\'database\']);'
-            // @todo: handle table name
-            //. "\n" . '$metadata->setTable(\'' . $tableDescription['tableName'] . '\');'
+            . "\n" . '$metadata->setTable(\'' . $tableDescription->getName() . '\');'
             . "\n\n"
             . '$metadata';
 
         /**
          * @var FieldDescription $fieldDescription
          */
-        foreach ($tableDescription as $fieldDescription) {
+        foreach ($tableDescription->getFieldsDescription() as $fieldDescription) {
             $body .= $this->getFieldDeclarationforInitMetadataFunction($fieldDescription);
         }
         $body .= ';' . "\n\n" . 'return $metadata;';

@@ -5,6 +5,7 @@
 
 namespace CCMBenchmark\TingGenerator\Command;
 
+use CCMBenchmark\TingGenerator\Database\TableDescription;
 use CCMBenchmark\TingGenerator\Generator\Repository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -134,18 +135,21 @@ class TingGenerateCommand extends Command
         $entityNameFormatter = $this->configuration->getEntityNameFormatter();
         $repositoryNameFormatter = $this->configuration->getRepositoryNameFormatter();
 
-        foreach ($tablesData as $tableName => $tableData) {
+        /**
+         * @var TableDescription $tableDescription
+         */
+        foreach ($tablesData as $tableDescription) {
             $this->logger->info('----------------------------------------------');
 
-            $entityName = $entityNameFormatter($tableName);
+            $entityName = $entityNameFormatter($tableDescription->getName());
             $entityNamespace = $this->configuration->getEntityNamespace();
-            $this->generateEntity($entityName, $entityNamespace, $tableData);
+            $this->generateEntity($entityName, $entityNamespace, $tableDescription);
 
-            $repositoryName = $repositoryNameFormatter($tableName);
+            $repositoryName = $repositoryNameFormatter($tableDescription->getName());
             $this->generateRepository(
                 $repositoryName,
                 $this->configuration->getRepositoryNamespace(),
-                $tableData,
+                $tableDescription,
                 $entityNamespace . '\\' . $entityName
             );
         }
@@ -187,29 +191,40 @@ class TingGenerateCommand extends Command
      *
      * @param string $entityName
      * @param string $entityNamespace
-     * @param array $tableData
+     * @param TableDescription $tableDescription
      *
      * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
      * @throws \Zend\Code\Generator\Exception\RuntimeException
      *
      * @return bool Return true on success, false on failure.
      */
-    private function generateEntity($entityName, $entityNamespace, array $tableData)
+    private function generateEntity($entityName, $entityNamespace, TableDescription $tableDescription)
     {
         $this->logger->info('Generate entity: ' . $entityName);
 
         $classGenerator = $this
             ->entityGenerator
-            ->generateEntityCode($entityName, $entityNamespace, $tableData)
+            ->generateEntityCode($entityName, $entityNamespace, $tableDescription->getFieldsDescription())
             ->getClassGenerator();
 
         return $this->writeClass($entityName, $classGenerator, $this->configuration->getEntityDirectory());
     }
 
+    /**
+     * @param string $repositoryName
+     * @param string $repositoryNamespace
+     * @param TableDescription $tableDescription
+     * @param string $entityFullQualifiedName
+     *
+     * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
+     * @throws \Zend\Code\Generator\Exception\RuntimeException
+     *
+     * @return bool
+     */
     private function generateRepository(
         $repositoryName,
         $repositoryNamespace,
-        array $tableData,
+        TableDescription $tableDescription,
         $entityFullQualifiedName
     ) {
         $this->logger->info('Generate repository: ' . $repositoryName);
@@ -219,7 +234,7 @@ class TingGenerateCommand extends Command
             ->generateRepositoryCode(
                 $repositoryName,
                 $repositoryNamespace,
-                $tableData,
+                $tableDescription,
                 $entityFullQualifiedName
             )->getClassGenerator();
 

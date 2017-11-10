@@ -3,6 +3,7 @@
 namespace CCMBenchmark\TingGenerator\Database\MySQL;
 
 use CCMBenchmark\TingGenerator\Database\FieldDescription;
+use CCMBenchmark\TingGenerator\Database\TableDescription;
 use CCMBenchmark\TingGenerator\Log\Logger;
 
 class TableAnalyzer
@@ -93,7 +94,7 @@ class TableAnalyzer
     /**
      * @param string $tableName
      *
-     * @return array
+     * @return TableDescription
      */
     private function getTableData($tableName)
     {
@@ -112,6 +113,6 @@ class TableAnalyzer
             );
         }
 
-        return $tableData;
+        return new TableDescription($tableName, $tableData);
     }
 }
