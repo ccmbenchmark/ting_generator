@@ -106,9 +106,10 @@ class TableAnalyzer
         $tableData = [];
         foreach ($query as $row) {
             $tableData[] = new PropertyData(
-                $row['Type'],
+                $this->typeMapping->getFromMysqlType($row['Type']),
                 $row['Field'],
-                $this->typeMapping->getFromMysqlType($row['Type']));
+                $row['Key'] === 'PRI'
+            );
         }
 
         return $tableData;
