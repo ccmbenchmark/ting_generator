@@ -170,7 +170,7 @@ class Entity
                 ->addPropertyFromGenerator(
                     PropertyGenerator::fromArray([
                         'name' => lcfirst($this->stringFormatter->camelize($fieldDescription->getName())),
-                        'defaultValue' => null, // @todo: handle default value for property
+                        'defaultValue' => null,
                         'visibility' => PropertyGenerator::VISIBILITY_PRIVATE,
                         'docblock' => DocBlockGenerator::fromArray([
                             'tags' => [new GenericTag('var', $propertyTypeForDocBlock)]
