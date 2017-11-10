@@ -158,7 +158,7 @@ class Entity
      */
     private function addPropertyToClass(PropertyData $propertyData)
     {
-        $propertyType = $propertyData->getPhpType();
+        $propertyType = $propertyData->getType();
         $propertyTypeForDocBlock = $propertyType;
         if ($propertyType !== '') {
             $propertyTypeForDocBlock .= '|null';
@@ -193,7 +193,7 @@ class Entity
         $setterBody = '';
         $propertyName = $this->formatPropertyName($propertyData->getName());
         $parameterName = '$' . $propertyName;
-        $propertyType = $propertyData->getPhpType();
+        $propertyType = $propertyData->getType();
 
         if ($this->shouldCloneProperty($propertyType) === true) {
             $setterBody .= '$clone = clone ' . $parameterName . ';' . "\n";
@@ -244,7 +244,7 @@ class Entity
      */
     private function addGetterForProperty(PropertyData $propertyData)
     {
-        $propertyType = $propertyData->getPhpType();
+        $propertyType = $propertyData->getType();
         $propertyName = $this->formatPropertyName($propertyData->getName());
         $getterBody = 'return';
         if ($this->shouldCastProperty($propertyType) === true) {
