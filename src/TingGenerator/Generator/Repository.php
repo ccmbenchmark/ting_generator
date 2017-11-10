@@ -196,7 +196,7 @@ class Repository
             "\n" . '    ->addField(['
             . "\n" . '        \'fieldName\' => \'' . $fieldName . '\','
             . "\n" . '        \'columnName\' => \'' . lcfirst($this->stringFormatter->camelize($fieldName)) . '\','
-            . "\n" . '        \'type\' => \'' . $propertyData->getPhpType() . '\'';
+            . "\n" . '        \'type\' => \'' . $propertyData->getType() . '\'';
 
         if ($propertyData->isPrimary() === true) {
             $body .= ',' . "\n" . '        \'primary\' => true';
