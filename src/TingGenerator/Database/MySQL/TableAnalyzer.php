@@ -105,7 +105,10 @@ class TableAnalyzer
 
         $tableData = [];
         foreach ($query as $row) {
-            $tableData[] = new PropertyData($this->typeMapping->getFromMysqlType($row['Type']), $row['Field']);
+            $tableData[] = new PropertyData(
+                $row['Type'],
+                $row['Field'],
+                $this->typeMapping->getFromMysqlType($row['Type']));
         }
 
         return $tableData;
