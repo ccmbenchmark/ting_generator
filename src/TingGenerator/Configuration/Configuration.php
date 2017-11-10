@@ -39,6 +39,11 @@ class Configuration
     private $logger;
 
     /**
+     * @var mixed
+     */
+    private $defaultFormatter;
+
+    /**
      * Configuration constructor.
      * @param array $configurationData
      */
@@ -46,6 +51,10 @@ class Configuration
     {
         $this->configurationData = $configurationData;
         $this->logger = $logger;
+
+        $this->defaultFormatter = function ($string) {
+            return $string;
+        };
     }
 
     /**
@@ -156,14 +165,14 @@ class Configuration
     }
 
     /**
-     * @return mixed|null
+     * @return mixed
      */
     public function getEntityNameFormatter()
     {
         $entityNameFormatter = $this->getParameter('entityNameFormatter');
         if (is_callable($entityNameFormatter) === false) {
             $this->logger->warning('Parameter \'entityNameFormatter\' is defined but must be a callable.');
-            return null;
+            $entityNameFormatter = $this->defaultFormatter;
         }
 
         return $entityNameFormatter;
@@ -175,5 +184,35 @@ class Configuration
     public function getEntityDirectory()
     {
         return (string) $this->getMandatoryParameter('entitiesDirectory');
+    }
+
+    /**
+     * @return string
+     */
+    public function getRepositoryNamespace()
+    {
+        return (string) $this->getParameter('repositoryNamespace');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRepositoryNameFormatter()
+    {
+        $repositoryNameFormatter = $this->getParameter('repositoryNameFormatter');
+        if (is_callable($repositoryNameFormatter) === false) {
+            $this->logger->warning('Parameter \'repositoryNameFormatter\' is defined but must be a callable.');
+            $repositoryNameFormatter = $this->defaultFormatter;
+        }
+
+        return $repositoryNameFormatter;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRepositoryDirectory()
+    {
+        return (string) $this->getMandatoryParameter('repositoriesDirectory');
     }
 }
