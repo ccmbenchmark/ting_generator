@@ -1,8 +1,8 @@
 <?php
 
-namespace CCMBenchmark\TingGenerator\Generator;
+namespace CCMBenchmark\TingGenerator\Database;
 
-class PropertyData
+class FieldDescription
 {
     /**
      * @var string

@@ -2,7 +2,7 @@
 
 namespace CCMBenchmark\TingGenerator\Database\MySQL;
 
-use CCMBenchmark\TingGenerator\Generator\PropertyData;
+use CCMBenchmark\TingGenerator\Database\FieldDescription;
 use CCMBenchmark\TingGenerator\Log\Logger;
 
 class TableAnalyzer
@@ -105,7 +105,7 @@ class TableAnalyzer
 
         $tableData = [];
         foreach ($query as $row) {
-            $tableData[] = new PropertyData(
+            $tableData[] = new FieldDescription(
                 $this->typeMapping->getFromMysqlType($row['Type']),
                 $row['Field'],
                 $row['Key'] === 'PRI'

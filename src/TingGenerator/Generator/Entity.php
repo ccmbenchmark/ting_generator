@@ -35,6 +35,7 @@ use Zend\Code\Generator\DocBlockGenerator;
 use Zend\Code\Generator\Exception\InvalidArgumentException;
 use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\PropertyGenerator;
+use CCMBenchmark\TingGenerator\Database\FieldDescription;
 
 class Entity
 {
@@ -152,13 +153,13 @@ class Entity
     }
 
     /**
-     * @param PropertyData $propertyData
+     * @param FieldDescription $fieldDescription
      *
      * @return $this
      */
-    private function addPropertyToClass(PropertyData $propertyData)
+    private function addPropertyToClass(FieldDescription $fieldDescription)
     {
-        $propertyType = $propertyData->getType();
+        $propertyType = $fieldDescription->getType();
         $propertyTypeForDocBlock = $propertyType;
         if ($propertyType !== '') {
             $propertyTypeForDocBlock .= '|null';
@@ -168,7 +169,7 @@ class Entity
             $this->classGenerator
                 ->addPropertyFromGenerator(
                     PropertyGenerator::fromArray([
-                        'name' => lcfirst($this->stringFormatter->camelize($propertyData->getName())),
+                        'name' => lcfirst($this->stringFormatter->camelize($fieldDescription->getName())),
                         'defaultValue' => null, // @todo: handle default value for property
                         'visibility' => PropertyGenerator::VISIBILITY_PRIVATE,
                         'docblock' => DocBlockGenerator::fromArray([
@@ -184,16 +185,16 @@ class Entity
     }
 
     /**
-     * @param PropertyData $propertyData
+     * @param FieldDescription $fieldDescription
      *
      * @return $this
      */
-    private function addSetterForProperty(PropertyData $propertyData)
+    private function addSetterForProperty(FieldDescription $fieldDescription)
     {
         $setterBody = '';
-        $propertyName = $this->formatPropertyName($propertyData->getName());
+        $propertyName = $this->formatPropertyName($fieldDescription->getName());
         $parameterName = '$' . $propertyName;
-        $propertyType = $propertyData->getType();
+        $propertyType = $fieldDescription->getType();
 
         if ($this->shouldCloneProperty($propertyType) === true) {
             $setterBody .= '$clone = clone ' . $parameterName . ';' . "\n";
@@ -238,14 +239,14 @@ class Entity
     }
 
     /**
-     * @param PropertyData $propertyData
+     * @param FieldDescription $fieldDescription
      *
      * @return $this
      */
-    private function addGetterForProperty(PropertyData $propertyData)
+    private function addGetterForProperty(FieldDescription $fieldDescription)
     {
-        $propertyType = $propertyData->getType();
-        $propertyName = $this->formatPropertyName($propertyData->getName());
+        $propertyType = $fieldDescription->getType();
+        $propertyName = $this->formatPropertyName($fieldDescription->getName());
         $getterBody = 'return';
         if ($this->shouldCastProperty($propertyType) === true) {
             $getterBody .= ' (' . $propertyType . ')';

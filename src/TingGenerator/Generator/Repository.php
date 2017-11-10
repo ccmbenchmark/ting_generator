@@ -11,6 +11,7 @@ use Zend\Code\Generator\DocBlock\Tag\ThrowsTag;
 use Zend\Code\Generator\DocBlockGenerator;
 use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\ParameterGenerator;
+use CCMBenchmark\TingGenerator\Database\FieldDescription;
 
 class Repository
 {
@@ -175,10 +176,10 @@ class Repository
             . '$metadata';
 
         /**
-         * @var PropertyData $propertyData
+         * @var FieldDescription $fieldDescription
          */
-        foreach ($tableDescription as $propertyData) {
-            $body .= $this->getFieldDeclarationforInitMetadataFunction($propertyData);
+        foreach ($tableDescription as $fieldDescription) {
+            $body .= $this->getFieldDeclarationforInitMetadataFunction($fieldDescription);
         }
         $body .= ';' . "\n\n" . 'return $metadata;';
 
@@ -186,19 +187,19 @@ class Repository
     }
 
     /**
-     * @param PropertyData $propertyData
+     * @param FieldDescription $fieldDescription
      * @return string
      */
-    private function getFieldDeclarationforInitMetadataFunction(PropertyData $propertyData)
+    private function getFieldDeclarationforInitMetadataFunction(FieldDescription $fieldDescription)
     {
-        $fieldName = $propertyData->getName();
+        $fieldName = $fieldDescription->getName();
         $body =
             "\n" . '    ->addField(['
             . "\n" . '        \'fieldName\' => \'' . $fieldName . '\','
             . "\n" . '        \'columnName\' => \'' . lcfirst($this->stringFormatter->camelize($fieldName)) . '\','
-            . "\n" . '        \'type\' => \'' . $propertyData->getType() . '\'';
+            . "\n" . '        \'type\' => \'' . $fieldDescription->getType() . '\'';
 
-        if ($propertyData->isPrimary() === true) {
+        if ($fieldDescription->isPrimary() === true) {
             $body .= ',' . "\n" . '        \'primary\' => true';
         }
         $body .= "\n" . '    ])';
