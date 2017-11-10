@@ -1,13 +1,14 @@
 <?php
 /**
- * sudo -E php application.php generate:entities /var/www/ting_generator/conf.php
+ * sudo -E php application.php ting:generate --conf=/var/www/ting_generator/conf.php --mode=3
  */
 
 namespace CCMBenchmark\TingGenerator\Command;
 
+use CCMBenchmark\TingGenerator\Generator\Repository;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use CCMBenchmark\TingGenerator\Generator\Entity;
 use CCMBenchmark\TingGenerator\FileGeneration\ClassWriter;
@@ -20,8 +21,12 @@ use CCMBenchmark\TingGenerator\Database\MySQL\TypeMapping;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\FileGenerator;
 
-class GenerateEntitiesCommand extends Command
+class TingGenerateCommand extends Command
 {
+    const MODE_ONLY_ENTITIES = 1;
+    const MODE_ONLY_REPOSITORIES = 2;
+    const MODE_ALL = 3;
+
     /**
      * @var Logger
      */
@@ -33,9 +38,9 @@ class GenerateEntitiesCommand extends Command
     private $entityGenerator;
 
     /**
-     * @var mixed|null
+     * @var Repository
      */
-    private $entityNameFormatter;
+    private $repositoryGenerator;
 
     /**
      * @var Configuration
@@ -54,9 +59,40 @@ class GenerateEntitiesCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('generate:entities')
+            ->setName('ting:generate')
             ->setDescription('Generate your entities')
-            ->addArgument('conf', InputArgument::REQUIRED, 'Full path to configuration file');
+            ->addOption(
+                'conf',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Full path to configuration file'
+            )
+            ->addOption(
+                'mode',
+                self::MODE_ALL,
+                InputOption::VALUE_REQUIRED,
+                'Generation mode. By default, generate entities and repositories'
+            );
+    }
+
+    /**
+     * @param InputInterface $input
+     *
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     *
+     * @return int|null
+     */
+    private function getGenerationMode(InputInterface $input)
+    {
+        $generationMode = (int) $input->getOption('mode');
+        if (in_array(
+            $generationMode,
+            [self::MODE_ONLY_ENTITIES, self::MODE_ONLY_REPOSITORIES, self::MODE_ALL]
+        ) === false) {
+            return null;
+        }
+
+        return $generationMode;
     }
 
     /**
@@ -73,13 +109,19 @@ class GenerateEntitiesCommand extends Command
     {
         $this->logger = new Logger($output);
         $this->entityGenerator = new Entity(new ClassGenerator(), $this->logger, new StringFormatter());
+        $this->repositoryGenerator = new Repository(new ClassGenerator(), $this->logger, new StringFormatter());
         $this->classWriter = new ClassWriter(new FileGenerator(), $this->logger);
 
-        $confArgument = $input->getArgument('conf');
-
-        $this->configuration = $this->getConfiguration($confArgument);
+        $confOption = $input->getOption('conf');
+        $this->configuration = $this->getConfiguration($confOption);
         if ($this->configuration === null) {
-            $this->logger->error('Configuration file not found: ' . $confArgument);
+            $this->logger->error('Configuration file not found: ' . $confOption);
+            return 1;
+        }
+
+        $modeOption = $this->getGenerationMode($input);
+        if ($modeOption === null) {
+            $this->logger->error('Invalid mode: ' . $modeOption);
             return 1;
         }
 
@@ -89,11 +131,23 @@ class GenerateEntitiesCommand extends Command
             return 1;
         }
 
-        $this->entityNameFormatter = $this->configuration->getEntityNameFormatter();
+        $entityNameFormatter = $this->configuration->getEntityNameFormatter();
+        $repositoryNameFormatter = $this->configuration->getRepositoryNameFormatter();
 
         foreach ($tablesData as $tableName => $tableData) {
             $this->logger->info('----------------------------------------------');
-            $this->generateEntity($tableName, $this->configuration->getEntityNamespace(), $tableData);
+
+            $entityName = $entityNameFormatter($tableName);
+            $entityNamespace = $this->configuration->getEntityNamespace();
+            $this->generateEntity($entityName, $entityNamespace, $tableData);
+
+            $repositoryName = $repositoryNameFormatter($tableName);
+            $this->generateRepository(
+                $repositoryName,
+                $this->configuration->getRepositoryNamespace(),
+                $tableData,
+                $entityNamespace . '\\' . $entityName
+            );
         }
 
         return 1;
@@ -142,45 +196,63 @@ class GenerateEntitiesCommand extends Command
      */
     private function generateEntity($entityName, $entityNamespace, array $tableData)
     {
-        $entityNameFormatted = $entityName;
-        if ($this->entityNameFormatter !== null) {
-            $formatter = $this->entityNameFormatter;
-            $entityNameFormatted = $formatter($entityName);
-        }
-
-        $this->logger->info('Generate entity: ' . $entityNameFormatted);
+        $this->logger->info('Generate entity: ' . $entityName);
 
         $classGenerator = $this
             ->entityGenerator
-            ->generateEntityCode($entityNameFormatted, $entityNamespace, $tableData)
+            ->generateEntityCode($entityName, $entityNamespace, $tableData)
             ->getClassGenerator();
 
-        return $this->writeEntity($entityNameFormatted, $classGenerator);
+        return $this->writeClass($entityName, $classGenerator, $this->configuration->getEntityDirectory());
+    }
+
+    private function generateRepository(
+        $repositoryName,
+        $repositoryNamespace,
+        array $tableData,
+        $entityFullQualifiedName
+    ) {
+        $this->logger->info('Generate repository: ' . $repositoryName);
+
+        $classGenerator = $this
+            ->repositoryGenerator
+            ->generateRepositoryCode(
+                $repositoryName,
+                $repositoryNamespace,
+                $tableData,
+                $entityFullQualifiedName
+            )->getClassGenerator();
+
+        return $this->writeClass(
+            $repositoryName,
+            $classGenerator,
+            $this->configuration->getRepositoryDirectory()
+        );
     }
 
     /**
      * @param string $entityName
      * @param ClassGenerator $classGenerator
+     * @param string $targetDirectory
      *
      * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
      * @throws \Zend\Code\Generator\Exception\RuntimeException
      *
      * @return bool Return true on success, false on failure.
      */
-    private function writeEntity($entityName, $classGenerator)
+    private function writeClass($entityName, $classGenerator, $targetDirectory)
     {
         $this->logger->info('Writing...');
 
-        $entityDirectory = $this->configuration->getEntityDirectory();
-        if ($entityDirectory === '') {
+        if ($targetDirectory === '') {
             $this
                 ->logger
                 ->error('You must specify a repository for generated entities. See entitiesDirectory in conf.');
             return false;
         }
 
-        $this->logger->info('... in directory: ' . $entityDirectory);
+        $this->logger->info('... in directory: ' . $targetDirectory);
 
-        return $this->classWriter->write($entityName, $classGenerator, $entityDirectory);
+        return $this->classWriter->write($entityName, $classGenerator, $targetDirectory);
     }
 }
