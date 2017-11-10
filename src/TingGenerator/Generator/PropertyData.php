@@ -15,21 +15,21 @@ class PropertyData
     private $name;
 
     /**
-     * @var string
+     * @var bool
      */
-    private $phpType;
+    private $isPrimary;
 
     /**
      * PropertyData constructor.
      * @param string $type
      * @param string $name
-     * @param string $phpType
+     * @param bool   $isPrimary
      */
-    public function __construct($type, $name, $phpType)
+    public function __construct($type, $name, $isPrimary = false)
     {
         $this->type = (string) $type;
         $this->name = (string) $name;
-        $this->phpType = (string) $phpType;
+        $this->isPrimary = (bool) $isPrimary;
     }
 
     /**
@@ -49,10 +49,10 @@ class PropertyData
     }
 
     /**
-     * @return string
+     * @return bool
      */
-    public function getPhpType()
+    public function isPrimary()
     {
-        return $this->phpType;
+        return $this->isPrimary;
     }
 }
