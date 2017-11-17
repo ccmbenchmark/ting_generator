@@ -28,6 +28,12 @@ class TableAnalyzer
      */
     private $databaseName;
 
+    const DEFAULT_HOST = '127.0.0.1';
+
+    const DEFAULT_PORT = 3302;
+
+    const DEFAULT_CHARSET = 'utf8';
+
     /**
      * TableAnalyzer constructor.
      * @param TypeMapping $typeMapping
@@ -49,9 +55,30 @@ class TableAnalyzer
      *
      * @return $this
      */
-    public function connect($userName, $password, $databaseName, $host = '127.0.0.1', $port = 3302, $charset = 'utf8')
-    {
+    public function connect(
+        $userName,
+        $password,
+        $databaseName,
+        $host = self::DEFAULT_HOST,
+        $port = self::DEFAULT_PORT,
+        $charset = self::DEFAULT_CHARSET
+    ) {
         $this->databaseName = $databaseName;
+
+        $host = (string) $host;
+        if ($host === '') {
+            $host = self::DEFAULT_HOST;
+        }
+
+        $port = (int) $port;
+        if ($port === 0) {
+            $port = self::DEFAULT_PORT;
+        }
+
+        $charset = (string) $charset;
+        if ($charset === '') {
+            $charset = self::DEFAULT_CHARSET;
+        }
 
         $this->pdo = new \PDO(
             sprintf(
