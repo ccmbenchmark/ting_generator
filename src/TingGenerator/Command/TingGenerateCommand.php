@@ -75,7 +75,7 @@ class TingGenerateCommand extends Command
             )
             ->addOption(
                 'mode',
-                self::MODE_ALL,
+                null,
                 InputOption::VALUE_REQUIRED,
                 'Generation mode. By default, generate entities and repositories'
             );
