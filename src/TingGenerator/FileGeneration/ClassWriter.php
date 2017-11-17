@@ -84,8 +84,6 @@ class ClassWriter
             return false;
         }
 
-        $this->logger->info('File written in: ' . $filename);
-
         return true;
     }
 }

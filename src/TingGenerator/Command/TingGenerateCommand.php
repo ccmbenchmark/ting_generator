@@ -54,6 +54,11 @@ class TingGenerateCommand extends Command
     private $classWriter;
 
     /**
+     * @var int
+     */
+    private $generationMode;
+
+    /**
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @throws \Symfony\Component\Console\Exception\LogicException
      */
@@ -120,9 +125,9 @@ class TingGenerateCommand extends Command
             return 1;
         }
 
-        $modeOption = $this->getGenerationMode($input);
-        if ($modeOption === null) {
-            $this->logger->error('Invalid mode: ' . $modeOption);
+        $this->generationMode = $this->getGenerationMode($input);
+        if ($this->generationMode === null) {
+            $this->logger->error('Invalid mode');
             return 1;
         }
 
@@ -141,10 +146,30 @@ class TingGenerateCommand extends Command
         foreach ($tablesData as $tableDescription) {
             $this->logger->info('----------------------------------------------');
 
-            $entityName = $entityNameFormatter($tableDescription->getName());
-            $entityNamespace = $this->configuration->getEntityNamespace();
-            $this->generateEntity($entityName, $entityNamespace, $tableDescription);
+            $this->generate($tableDescription, $entityNameFormatter, $repositoryNameFormatter);
+        }
 
+        return 1;
+    }
+
+    /**
+     * @param TableDescription $tableDescription
+     * @param $entityNameFormatter
+     * @param $repositoryNameFormatter
+     *
+     * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
+     * @throws \Zend\Code\Generator\Exception\RuntimeException
+     */
+    private function generate(TableDescription $tableDescription, $entityNameFormatter, $repositoryNameFormatter)
+    {
+        $entityName = $entityNameFormatter($tableDescription->getName());
+        $entityNamespace = $this->configuration->getEntityNamespace();
+
+        if ($this->shouldGenerateEntity() === true) {
+            $this->generateEntity($entityName, $entityNamespace, $tableDescription);
+        }
+
+        if ($this->shouldGenerateRepository() === true) {
             $repositoryName = $repositoryNameFormatter($tableDescription->getName());
             $this->generateRepository(
                 $repositoryName,
@@ -153,8 +178,6 @@ class TingGenerateCommand extends Command
                 $entityNamespace . '\\' . $entityName
             );
         }
-
-        return 1;
     }
 
     /**
@@ -246,7 +269,7 @@ class TingGenerateCommand extends Command
     }
 
     /**
-     * @param string $entityName
+     * @param string $className
      * @param ClassGenerator $classGenerator
      * @param string $targetDirectory
      *
@@ -255,10 +278,8 @@ class TingGenerateCommand extends Command
      *
      * @return bool Return true on success, false on failure.
      */
-    private function writeClass($entityName, $classGenerator, $targetDirectory)
+    private function writeClass($className, $classGenerator, $targetDirectory)
     {
-        $this->logger->info('Writing...');
-
         if ($targetDirectory === '') {
             $this
                 ->logger
@@ -266,8 +287,24 @@ class TingGenerateCommand extends Command
             return false;
         }
 
-        $this->logger->info('... in directory: ' . $targetDirectory);
+        $this->logger->info('Writing class in directory: ' . $targetDirectory);
 
-        return $this->classWriter->write($entityName, $classGenerator, $targetDirectory);
+        return $this->classWriter->write($className, $classGenerator, $targetDirectory);
+    }
+
+    /**
+     * @return bool
+     */
+    private function shouldGenerateEntity()
+    {
+        return $this->generationMode === self::MODE_ALL || $this->generationMode === self::MODE_ONLY_ENTITIES;
+    }
+
+    /**
+     * @return bool
+     */
+    private function shouldGenerateRepository()
+    {
+        return $this->generationMode === self::MODE_ALL || $this->generationMode === self::MODE_ONLY_REPOSITORIES;
     }
 }
