@@ -179,7 +179,7 @@ class Repository
          * @var FieldDescription $fieldDescription
          */
         foreach ($tableDescription->getFieldsDescription() as $fieldDescription) {
-            $body .= $this->getFieldDeclarationforInitMetadataFunction($fieldDescription);
+            $body .= $this->getFieldDeclarationForInitMetadataFunction($fieldDescription);
         }
         $body .= ';' . "\n\n" . 'return $metadata;';
 
@@ -190,7 +190,7 @@ class Repository
      * @param FieldDescription $fieldDescription
      * @return string
      */
-    private function getFieldDeclarationforInitMetadataFunction(FieldDescription $fieldDescription)
+    private function getFieldDeclarationForInitMetadataFunction(FieldDescription $fieldDescription)
     {
         $fieldName = $fieldDescription->getName();
         $body = "\n" . '    ->addField([';
