@@ -205,7 +205,8 @@ class Entity
             $setterBody .= $parameterName . ' = (' . $propertyType . ') ' . $parameterName . ';' . "\n";
         }
 
-        $setterBody .= '$this->propertyChanged(\'' . $propertyName . '\', $this->' . $propertyName . ', ' . $parameterName . ');'
+        $setterBody .=
+            '$this->propertyChanged(\'' . $propertyName . '\', $this->' . $propertyName . ', ' . $parameterName . ');'
             . "\n"
             . '$this->' . $propertyName . ' = ' . $parameterName . ';'
             . "\n"
