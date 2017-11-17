@@ -86,7 +86,7 @@ class TingGenerateCommand extends Command
      *
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      *
-     * @return int|null
+     * @return int
      */
     private function getGenerationMode(InputInterface $input)
     {
@@ -95,7 +95,7 @@ class TingGenerateCommand extends Command
             $generationMode,
             [self::MODE_ONLY_ENTITIES, self::MODE_ONLY_REPOSITORIES, self::MODE_ALL]
         ) === false) {
-            return null;
+            return self::MODE_ALL;
         }
 
         return $generationMode;
@@ -126,10 +126,6 @@ class TingGenerateCommand extends Command
         }
 
         $this->generationMode = $this->getGenerationMode($input);
-        if ($this->generationMode === null) {
-            $this->logger->error('Invalid mode');
-            return 1;
-        }
 
         $tablesData = $this->getTablesData();
         if ($tablesData === null) {
