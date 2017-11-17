@@ -142,7 +142,10 @@ class TingGenerateCommand extends Command
         foreach ($tablesData as $tableDescription) {
             $this->logger->info('----------------------------------------------');
 
-            $this->generate($tableDescription, $entityNameFormatter, $repositoryNameFormatter);
+            $success = $this->generate($tableDescription, $entityNameFormatter, $repositoryNameFormatter);
+            if ($success === false) {
+                return 0;
+            }
         }
 
         return 1;
@@ -155,19 +158,26 @@ class TingGenerateCommand extends Command
      *
      * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
      * @throws \Zend\Code\Generator\Exception\RuntimeException
+     *
+     * @return boolean
      */
     private function generate(TableDescription $tableDescription, $entityNameFormatter, $repositoryNameFormatter)
     {
         $entityName = $entityNameFormatter($tableDescription->getName());
         $entityNamespace = $this->configuration->getEntityNamespace();
 
+        $success = true;
         if ($this->shouldGenerateEntity() === true) {
-            $this->generateEntity($entityName, $entityNamespace, $tableDescription);
+            $success = $this->generateEntity($entityName, $entityNamespace, $tableDescription);
+        }
+
+        if ($success === false) {
+            return false;
         }
 
         if ($this->shouldGenerateRepository() === true) {
             $repositoryName = $repositoryNameFormatter($tableDescription->getName());
-            $this->generateRepository(
+            return $this->generateRepository(
                 $repositoryName,
                 $this->configuration->getRepositoryNamespace(),
                 $tableDescription,
