@@ -279,7 +279,7 @@ class TingGenerateCommand extends Command
         if ($targetDirectory === '') {
             $this
                 ->logger
-                ->error('You must specify a repository for generated entities. See entitiesDirectory in conf.');
+                ->error('You must specify a target directory for generated classes.');
             return false;
         }
 
