@@ -50,10 +50,10 @@ class TypeMapping
     private function isString($mysqlType)
     {
         return preg_match(
-                '~^char|varchar|tinytext|text|mediumtext|longtext|json'.
-                '|binary|varbinary|tinyblob|blob|mediumblob|longblob|enum|set~',
-                $mysqlType
-            ) === 1;
+            '~^char|varchar|tinytext|text|mediumtext|longtext|json'.
+            '|binary|varbinary|tinyblob|blob|mediumblob|longblob|enum|set~',
+            $mysqlType
+        ) === 1;
     }
 
     /**
