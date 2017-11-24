@@ -6,6 +6,7 @@
 namespace CCMBenchmark\TingGenerator\Command;
 
 use CCMBenchmark\Ting\Services;
+use CCMBenchmark\TingGenerator\Database\Analyzer\AnalyzerFactory;
 use CCMBenchmark\TingGenerator\Database\RepositoryFactory;
 use CCMBenchmark\TingGenerator\Database\TableDescription;
 use CCMBenchmark\TingGenerator\Generator\Repository;
@@ -224,13 +225,14 @@ class TingGenerateCommand extends Command
             $services->get('RepositoryFactory')
         );
 
-        return (
-            new TableAnalyzer(
-                new TypeMapping(),
-                $this->logger,
-                $repositoryFactory->getRepository()
-            )
-        )->getTablesData($connectionData->getDatabase(), $this->configuration->getExcludedTablesFilter());
+        $analyzerFactory = new AnalyzerFactory($repositoryFactory, $this->logger);
+        $analyzer = $analyzerFactory->getFromType($connectionData->getType());
+        if ($analyzer === null) {
+            return null;
+        }
+
+        return $analyzer
+            ->getTablesData($connectionData->getDatabase(), $this->configuration->getExcludedTablesFilter());
     }
 
     /**
