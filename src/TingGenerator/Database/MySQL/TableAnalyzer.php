@@ -2,8 +2,12 @@
 
 namespace CCMBenchmark\TingGenerator\Database\MySQL;
 
+use CCMBenchmark\Ting\Exception;
+use CCMBenchmark\Ting\Query\QueryException;
+use CCMBenchmark\Ting\Repository\HydratorArray;
 use CCMBenchmark\TingGenerator\Database\FieldDescription;
 use CCMBenchmark\TingGenerator\Database\TableDescription;
+use CCMBenchmark\TingGenerator\Database\Repository;
 use CCMBenchmark\TingGenerator\Log\Logger;
 
 class TableAnalyzer
@@ -19,120 +23,85 @@ class TableAnalyzer
     private $logger;
 
     /**
-     * @var \PDO
+     * @var Repository
      */
-    private $pdo;
-
-    /**
-     * @var string
-     */
-    private $databaseName;
-
-    const DEFAULT_HOST = '127.0.0.1';
-
-    const DEFAULT_PORT = 3306;
-
-    const DEFAULT_CHARSET = 'utf8';
+    private $repository;
 
     /**
      * TableAnalyzer constructor.
      * @param TypeMapping $typeMapping
      * @param Logger $logger
+     * @param Repository $repository
      */
-    public function __construct(TypeMapping $typeMapping, Logger $logger)
+    public function __construct(TypeMapping $typeMapping, Logger $logger, Repository $repository)
     {
         $this->typeMapping = $typeMapping;
         $this->logger = $logger;
+        $this->repository = $repository;
     }
 
     /**
-     * @param string $userName
-     * @param string $password
      * @param string $databaseName
-     * @param string $host
-     * @param int $port
-     * @param string $charset
-     *
-     * @return $this
-     */
-    public function connect(
-        $userName,
-        $password,
-        $databaseName,
-        $host = self::DEFAULT_HOST,
-        $port = self::DEFAULT_PORT,
-        $charset = self::DEFAULT_CHARSET
-    ) {
-        $this->databaseName = $databaseName;
-
-        $host = (string) $host;
-        if ($host === '') {
-            $host = self::DEFAULT_HOST;
-        }
-
-        $port = (int) $port;
-        if ($port === 0) {
-            $port = self::DEFAULT_PORT;
-        }
-
-        $charset = (string) $charset;
-        if ($charset === '') {
-            $charset = self::DEFAULT_CHARSET;
-        }
-
-        $this->pdo = new \PDO(
-            sprintf(
-                '%s:host=%s;port:%s;dbname=%s;charset=%s',
-                'mysql',
-                $host,
-                $port,
-                $this->databaseName,
-                $charset
-            ),
-            $userName,
-            $password
-        );
-
-        return $this;
-    }
-
-    /**
      * @param callable $excludedTablesFilter
      *
      * @return array
      */
-    public function getTablesData(callable $excludedTablesFilter = null)
+    public function getTablesData($databaseName, callable $excludedTablesFilter = null)
     {
-        $query = $this->pdo->query(sprintf('SHOW TABLES FROM %s', $this->databaseName));
         $tablesDataList = [];
-        foreach ($query->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-            $key = 'Tables_in_' . $this->databaseName;
+        $query = $this->repository->getQuery(sprintf('SHOW TABLES FROM %s', $databaseName));
+        try {
+            $result = $query->query($this->repository->getCollection(new HydratorArray()));
+        } catch (QueryException $exception) {
+            $this->logger->error($exception->getMessage());
+            return $tablesDataList;
+        } catch (Exception $exception) {
+            $this->logger->error($exception->getMessage());
+            return $tablesDataList;
+        }
 
-            if ($excludedTablesFilter($row[$key]) === true) {
+        foreach ($result as $row) {
+            $tableName = current($row);
+            if ($excludedTablesFilter($tableName) === true) {
                 continue;
             }
 
-            $tablesDataList[$row[$key]] = $this->getTableData($row[$key]);
+            $tableData = $this->getTableData($databaseName, $tableName);
+            if ($tableData === null) {
+                continue;
+            }
+
+            $tablesDataList[$tableName] = $tableData;
+
         }
 
         return $tablesDataList;
     }
 
     /**
+     * @param string $databaseName
      * @param string $tableName
      *
-     * @return TableDescription
+     * @return TableDescription|null
      */
-    private function getTableData($tableName)
+    private function getTableData($databaseName, $tableName)
     {
         $query = $this
-            ->pdo
-            ->query(
-                sprintf('DESCRIBE `%s`.`%s`', $this->databaseName, (string) $tableName)
-            );
+            ->repository
+            ->getQuery(sprintf('DESCRIBE `%s`.`%s`', $databaseName, (string) $tableName));
+
+        try {
+            $result = $query->query($this->repository->getCollection(new HydratorArray()));
+        } catch (QueryException $exception) {
+            $this->logger->error($exception->getMessage());
+            return null;
+        } catch (Exception $exception) {
+            $this->logger->error($exception->getMessage());
+            return null;
+        }
 
         $tableData = [];
-        foreach ($query as $row) {
+        foreach ($result as $row) {
             $tableData[] = new FieldDescription(
                 $this->typeMapping->getFromMysqlType($row['Type']),
                 $row['Field'],

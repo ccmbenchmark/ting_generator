@@ -4,6 +4,7 @@
   "require": {
     "php": ">=5.5",
     "zendframework/zend-code": "^3.1",
-    "symfony/console": "^3.3"
+    "symfony/console": "^3.3",
+    "ccmbenchmark/ting": "^3.4"
   }
 }

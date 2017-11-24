@@ -10,7 +10,7 @@ return [
      */
     'type' => 'mysql',
     'host' => '127.0.0.1',
-    'port' => '3302',
+    'port' => '3306',
     'databaseName' => 'auth_ccm_net',
     'charset' => 'utf8',
     'username' => 'mysql',

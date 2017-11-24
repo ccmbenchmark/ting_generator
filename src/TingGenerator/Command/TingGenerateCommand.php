@@ -5,6 +5,8 @@
 
 namespace CCMBenchmark\TingGenerator\Command;
 
+use CCMBenchmark\Ting\Services;
+use CCMBenchmark\TingGenerator\Database\RepositoryFactory;
 use CCMBenchmark\TingGenerator\Database\TableDescription;
 use CCMBenchmark\TingGenerator\Generator\Repository;
 use Symfony\Component\Console\Command\Command;
@@ -105,6 +107,8 @@ class TingGenerateCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      *
+     * @throws \Pimple\Exception\UnknownIdentifierException
+     * @throws \RuntimeException
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
      * @throws \Zend\Code\Generator\Exception\RuntimeException
@@ -184,6 +188,8 @@ class TingGenerateCommand extends Command
                 $entityNamespace . '\\' . $entityName
             );
         }
+
+        return true;
     }
 
     /**
@@ -198,21 +204,29 @@ class TingGenerateCommand extends Command
     }
 
     /**
+     * @throws \Pimple\Exception\UnknownIdentifierException
+     * @throws \RuntimeException
+     *
      * @return array
      */
     private function getTablesData()
     {
-        $tableAnalyzer = new TableAnalyzer(new TypeMapping(), $this->logger);
-        return $tableAnalyzer
-            ->connect(
-                $this->configuration->getUsername(),
-                $this->configuration->getPassword(),
-                $this->configuration->getDatabaseName(),
-                $this->configuration->getHost(),
-                $this->configuration->getPort(),
-                $this->configuration->getCharset()
+        $connectionData = $this->configuration->getConnectionData();
+        $services = new Services();
+        $repositoryFactory = new RepositoryFactory(
+            $connectionData,
+            $services->get('ConnectionPool'),
+            $services->get('MetadataRepository'),
+            $services->get('RepositoryFactory')
+        );
+
+        return (
+            new TableAnalyzer(
+                new TypeMapping(),
+                $this->logger,
+                $repositoryFactory->getRepository()
             )
-            ->getTablesData($this->configuration->getExcludedTablesFilter());
+        )->getTablesData($this->configuration->getDatabaseName(), $this->configuration->getExcludedTablesFilter());
     }
 
     /**

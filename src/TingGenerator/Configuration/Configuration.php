@@ -24,6 +24,7 @@
 
 namespace CCMBenchmark\TingGenerator\Configuration;
 
+use CCMBenchmark\TingGenerator\Database\ConnectionData;
 use CCMBenchmark\TingGenerator\Log\Logger;
 
 class Configuration
@@ -140,6 +141,22 @@ class Configuration
     public function getPassword()
     {
         return (string) $this->getMandatoryParameter('password');
+    }
+
+    /**
+     * @return ConnectionData
+     */
+    public function getConnectionData()
+    {
+        return new ConnectionData(
+            $this->getDataSourceType(),
+            $this->getHost(),
+            $this->getUsername(),
+            $this->getPassword(),
+            $this->getPort(),
+            $this->getCharset(),
+            $this->getDatabaseName()
+        );
     }
 
     /**
