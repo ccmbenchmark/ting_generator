@@ -18,9 +18,9 @@ use CCMBenchmark\TingGenerator\FileGeneration\ClassWriter;
 use CCMBenchmark\TingGenerator\Infrastructure\StringFormatter;
 use CCMBenchmark\TingGenerator\Log\Logger;
 use CCMBenchmark\TingGenerator\Configuration\ConfigurationLoader;
-use CCMBenchmark\TingGenerator\Database\MySQL\TableAnalyzer;
+use CCMBenchmark\TingGenerator\Database\Analyzer\MySQL\TableAnalyzer;
 use CCMBenchmark\TingGenerator\Configuration\Configuration;
-use CCMBenchmark\TingGenerator\Database\MySQL\TypeMapping;
+use CCMBenchmark\TingGenerator\Database\Analyzer\MySQL\TypeMapping;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\FileGenerator;
 

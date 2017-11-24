@@ -1,8 +1,10 @@
 <?php
 
-namespace CCMBenchmark\TingGenerator\Database\MySQL;
+namespace CCMBenchmark\TingGenerator\Database\Analyzer\MySQL;
 
-class TypeMapping
+use CCMBenchmark\TingGenerator\Database\Analyzer\TypeMapperInterface;
+
+class TypeMapping implements TypeMapperInterface
 {
     const TYPE_INT = 'int';
     const TYPE_STRING = 'string';

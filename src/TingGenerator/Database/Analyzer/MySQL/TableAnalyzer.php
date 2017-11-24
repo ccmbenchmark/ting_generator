@@ -1,16 +1,17 @@
 <?php
 
-namespace CCMBenchmark\TingGenerator\Database\MySQL;
+namespace CCMBenchmark\TingGenerator\Database\Analyzer\MySQL;
 
 use CCMBenchmark\Ting\Exception;
 use CCMBenchmark\Ting\Query\QueryException;
 use CCMBenchmark\Ting\Repository\HydratorArray;
 use CCMBenchmark\TingGenerator\Database\FieldDescription;
+use CCMBenchmark\TingGenerator\Database\Analyzer\TableAnalyzerInterface;
 use CCMBenchmark\TingGenerator\Database\TableDescription;
 use CCMBenchmark\TingGenerator\Database\Repository;
 use CCMBenchmark\TingGenerator\Log\Logger;
 
-class TableAnalyzer
+class TableAnalyzer implements TableAnalyzerInterface
 {
     /**
      * @var TypeMapping
