@@ -30,7 +30,7 @@ class TableAnalyzer
 
     const DEFAULT_HOST = '127.0.0.1';
 
-    const DEFAULT_PORT = 3302;
+    const DEFAULT_PORT = 3306;
 
     const DEFAULT_CHARSET = 'utf8';
 
