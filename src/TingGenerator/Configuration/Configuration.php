@@ -26,6 +26,7 @@ namespace CCMBenchmark\TingGenerator\Configuration;
 
 use CCMBenchmark\TingGenerator\Database\ConnectionData;
 use CCMBenchmark\TingGenerator\Log\Logger;
+use CCMBenchmark\TingGenerator\Configuration\Exception\MissingParameterException;
 
 class Configuration
 {
@@ -61,13 +62,16 @@ class Configuration
     /**
      * @param string $parameterName
      *
+     * @throws MissingParameterException
+     *
      * @return mixed
      */
     private function getMandatoryParameter($parameterName)
     {
         if (isset($this->configurationData[$parameterName]) === false) {
-            $this->logger->error('Missing \'' . $parameterName . '\' in configuration');
-            return null;
+            throw MissingParameterException::fromMissingParameterInConfiguration(
+                'Parameter "' . $parameterName . '" not found in your configuration file.'
+            );
         }
 
         return $this->configurationData[$parameterName];
@@ -88,6 +92,8 @@ class Configuration
     }
 
     /**
+     * @throws MissingParameterException
+     *
      * @return string
      */
     public function getDataSourceType()
@@ -96,6 +102,8 @@ class Configuration
     }
 
     /**
+     * @throws MissingParameterException
+     *
      * @return string
      */
     public function getHost()
@@ -104,6 +112,8 @@ class Configuration
     }
 
     /**
+     * @throws MissingParameterException
+     *
      * @return string
      */
     public function getPort()
@@ -112,6 +122,8 @@ class Configuration
     }
 
     /**
+     * @throws MissingParameterException
+     *
      * @return string
      */
     public function getDatabaseName()
@@ -120,6 +132,8 @@ class Configuration
     }
 
     /**
+     * @throws MissingParameterException
+     *
      * @return string
      */
     public function getCharset()
@@ -128,6 +142,8 @@ class Configuration
     }
 
     /**
+     * @throws MissingParameterException
+     *
      * @return string
      */
     public function getUsername()
@@ -136,6 +152,8 @@ class Configuration
     }
 
     /**
+     * @throws MissingParameterException
+     *
      * @return string
      */
     public function getPassword()
@@ -144,19 +162,24 @@ class Configuration
     }
 
     /**
-     * @return ConnectionData
+     * @return ConnectionData|null
      */
     public function getConnectionData()
     {
-        return new ConnectionData(
-            $this->getDataSourceType(),
-            $this->getHost(),
-            $this->getUsername(),
-            $this->getPassword(),
-            $this->getPort(),
-            $this->getCharset(),
-            $this->getDatabaseName()
-        );
+        try {
+            return new ConnectionData(
+                $this->getDataSourceType(),
+                $this->getHost(),
+                $this->getUsername(),
+                $this->getPassword(),
+                $this->getPort(),
+                $this->getCharset(),
+                $this->getDatabaseName()
+            );
+        } catch (MissingParameterException $exception) {
+            $this->logger->error($exception->getMessage());
+            return null;
+        }
     }
 
     /**
@@ -200,7 +223,12 @@ class Configuration
      */
     public function getEntityDirectory()
     {
-        return (string) $this->getMandatoryParameter('entitiesDirectory');
+        try {
+            return (string)$this->getMandatoryParameter('entitiesDirectory');
+        } catch (MissingParameterException $exception) {
+            $this->logger->error($exception->getMessage());
+            return '';
+        }
     }
 
     /**
@@ -230,6 +258,11 @@ class Configuration
      */
     public function getRepositoryDirectory()
     {
-        return (string) $this->getMandatoryParameter('repositoriesDirectory');
+        try {
+            return (string)$this->getMandatoryParameter('repositoriesDirectory');
+        } catch (MissingParameterException $exception) {
+            $this->logger->error($exception->getMessage());
+            return '';
+        }
     }
 }

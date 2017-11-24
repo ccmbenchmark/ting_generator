@@ -212,6 +212,10 @@ class TingGenerateCommand extends Command
     private function getTablesData()
     {
         $connectionData = $this->configuration->getConnectionData();
+        if ($connectionData === null) {
+            return null;
+        }
+
         $services = new Services();
         $repositoryFactory = new RepositoryFactory(
             $connectionData,
@@ -226,7 +230,7 @@ class TingGenerateCommand extends Command
                 $this->logger,
                 $repositoryFactory->getRepository()
             )
-        )->getTablesData($this->configuration->getDatabaseName(), $this->configuration->getExcludedTablesFilter());
+        )->getTablesData($connectionData->getDatabase(), $this->configuration->getExcludedTablesFilter());
     }
 
     /**
