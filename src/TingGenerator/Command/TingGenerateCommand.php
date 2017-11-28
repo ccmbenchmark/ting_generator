@@ -149,11 +149,11 @@ class TingGenerateCommand extends Command
 
             $success = $this->generate($tableDescription, $entityNameFormatter, $repositoryNameFormatter);
             if ($success === false) {
-                return 0;
+                return 1;
             }
         }
 
-        return 1;
+        return 0;
     }
 
     /**
