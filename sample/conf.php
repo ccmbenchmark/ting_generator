@@ -43,5 +43,10 @@ return [
      * Namespaces
      */
     'entityNamespace'         => 'AppBundle\Domain\Entity',
-    'repositoryNamespace'     => 'AppBundle\Infrastructure\Repository'
+    'repositoryNamespace'     => 'AppBundle\Infrastructure\Repository',
+
+    /**
+     * Target directory right
+     */
+    'targetDirectoryRight' => 0777
 ];

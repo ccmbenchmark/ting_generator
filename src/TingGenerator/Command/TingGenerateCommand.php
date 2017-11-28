@@ -1,6 +1,6 @@
 <?php
 /**
- * sudo -E php application.php ting:generate --conf=/var/www/ting_generator/conf.php --mode=3
+ * sudo -E php application.php ting:generate --conf=/var/www/ting_generator/sample/conf.php --mode=3
  */
 
 namespace CCMBenchmark\TingGenerator\Command;
@@ -315,7 +315,9 @@ class TingGenerateCommand extends Command
 
         $this->logger->info('Writing class in directory: ' . $targetDirectory);
 
-        return $this->classWriter->write($className, $classGenerator, $targetDirectory);
+        return $this
+            ->classWriter
+            ->write($className, $classGenerator, $targetDirectory, $this->configuration->getTargetDirectoryRight());
     }
 
     /**

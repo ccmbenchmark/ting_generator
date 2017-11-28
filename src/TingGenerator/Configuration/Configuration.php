@@ -265,4 +265,12 @@ class Configuration
             return '';
         }
     }
+
+    /**
+     * @return int
+     */
+    public function getTargetDirectoryRight()
+    {
+        return (int) $this->getParameter('targetDirectoryRight');
+    }
 }

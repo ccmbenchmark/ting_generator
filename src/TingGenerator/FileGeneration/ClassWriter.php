@@ -9,6 +9,8 @@ use Zend\Code\Generator\FileGenerator;
 
 class ClassWriter
 {
+    const DEFAULT_RIGHT = 0777;
+
     /**
      * @var FileGenerator
      */
@@ -52,22 +54,31 @@ class ClassWriter
      * @param string $className
      * @param ClassGenerator $classGenerator
      * @param string $targetDirectory
+     * @param int $targetDirectoryRight
      *
      * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
      * @throws \Zend\Code\Generator\Exception\RuntimeException
      *
      * @return bool
      */
-    public function write($className, ClassGenerator $classGenerator, $targetDirectory)
-    {
+    public function write(
+        $className,
+        ClassGenerator $classGenerator,
+        $targetDirectory,
+        $targetDirectoryRight = self::DEFAULT_RIGHT
+    ) {
         $this->initializeFileGenerator();
 
         $className = (string) $className;
         $targetDirectory = (string) $targetDirectory;
+        $targetDirectoryRight = (int) $targetDirectoryRight;
+        if ($targetDirectoryRight === 0) {
+            $targetDirectoryRight = self::DEFAULT_RIGHT;
+        }
 
         if (is_dir($targetDirectory) === false) {
             $this->logger->info('Creating directory: ' . $targetDirectory);
-            if (mkdir($targetDirectory, 0777, true) === false) {
+            if (mkdir($targetDirectory, $targetDirectoryRight, true) === false) {
                 $this->logger->error('Unable to write directory: ' . $targetDirectory);
                 return false;
             }
