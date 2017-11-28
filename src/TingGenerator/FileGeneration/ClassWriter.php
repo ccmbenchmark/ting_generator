@@ -71,17 +71,11 @@ class ClassWriter
 
         $className = (string) $className;
         $targetDirectory = (string) $targetDirectory;
-        $targetDirectoryRight = (int) $targetDirectoryRight;
-        if ($targetDirectoryRight === 0) {
-            $targetDirectoryRight = self::DEFAULT_RIGHT;
-        }
 
-        if (is_dir($targetDirectory) === false) {
-            $this->logger->info('Creating directory: ' . $targetDirectory);
-            if (mkdir($targetDirectory, $targetDirectoryRight, true) === false) {
-                $this->logger->error('Unable to write directory: ' . $targetDirectory);
-                return false;
-            }
+        if (is_dir($targetDirectory) === false
+            && $this->writeTargetDirectory($targetDirectory, $targetDirectoryRight) === false
+        ) {
+            return false;
         }
 
         $filename = $targetDirectory . '/' . $className . '.php';
@@ -92,6 +86,28 @@ class ClassWriter
             $this->fileGenerator->write();
         } catch (RuntimeException $exception) {
             $this->logger->error('Unable to write: ' . $filename . '. Error: ' . $exception->getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $targetDirectory
+     * @param int $targetDirectoryRight
+     *
+     * @return bool
+     */
+    private function writeTargetDirectory($targetDirectory, $targetDirectoryRight)
+    {
+        $targetDirectoryRight = (int) $targetDirectoryRight;
+        if ($targetDirectoryRight === 0) {
+            $targetDirectoryRight = self::DEFAULT_RIGHT;
+        }
+
+        $this->logger->info('Creating directory: ' . $targetDirectory);
+        if (mkdir($targetDirectory, $targetDirectoryRight, true) === false) {
+            $this->logger->error('Unable to write directory: ' . $targetDirectory);
             return false;
         }
 
