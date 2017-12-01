@@ -25,13 +25,10 @@
 namespace CCMBenchmark\TingGenerator\Database\Analyzer\MySQL;
 
 use CCMBenchmark\TingGenerator\Database\Analyzer\TypeMapperInterface;
+use CCMBenchmark\TingGenerator\Infrastructure\PHPType;
 
 class TypeMapping implements TypeMapperInterface
 {
-    const TYPE_INT = 'int';
-    const TYPE_STRING = 'string';
-    const TYPE_DATETIME = '\Datetime';
-
     /**
      * @param string $mysqlType
      *
@@ -42,15 +39,15 @@ class TypeMapping implements TypeMapperInterface
         $mysqlType = trim(mb_strtolower($mysqlType));
 
         if ($this->isInteger($mysqlType) === true) {
-            return self::TYPE_INT;
+            return PHPType::TYPE_INT;
         }
 
         if ($this->isString($mysqlType) === true || $this->isJson($mysqlType) === true) {
-            return self::TYPE_STRING;
+            return PHPType::TYPE_STRING;
         }
 
         if ($this->isDateTime($mysqlType) === true) {
-            return self::TYPE_DATETIME;
+            return PHPType::TYPE_DATETIME;
         }
 
         return null;
@@ -77,8 +74,8 @@ class TypeMapping implements TypeMapperInterface
     private function isString($mysqlType)
     {
         return preg_match(
-            '^(?:char|varchar|tinytext|text|mediumtext|longtext|json|binary|varbinary|tinyblob|'
-                . 'blob|mediumblob|longblob|enum|set)(?:\([0-9]+\))?$',
+            '~^(?:char|varchar|tinytext|text|mediumtext|longtext|json|binary|varbinary|tinyblob|'
+                . 'blob|mediumblob|longblob|enum|set)(?:\([0-9]+\))?$~',
             $mysqlType
         ) === 1;
     }
