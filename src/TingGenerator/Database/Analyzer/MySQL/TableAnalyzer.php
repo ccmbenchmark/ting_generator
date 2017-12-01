@@ -27,6 +27,7 @@ namespace CCMBenchmark\TingGenerator\Database\Analyzer\MySQL;
 use CCMBenchmark\Ting\Exception;
 use CCMBenchmark\Ting\Query\QueryException;
 use CCMBenchmark\Ting\Repository\HydratorArray;
+use CCMBenchmark\TingGenerator\Database\Analyzer\TypeMapperInterface;
 use CCMBenchmark\TingGenerator\Database\FieldDescription;
 use CCMBenchmark\TingGenerator\Database\Analyzer\TableAnalyzerInterface;
 use CCMBenchmark\TingGenerator\Database\TableDescription;
@@ -36,7 +37,7 @@ use CCMBenchmark\TingGenerator\Log\Logger;
 class TableAnalyzer implements TableAnalyzerInterface
 {
     /**
-     * @var TypeMapping
+     * @var TypeMapperInterface
      */
     private $typeMapping;
 
@@ -52,11 +53,11 @@ class TableAnalyzer implements TableAnalyzerInterface
 
     /**
      * TableAnalyzer constructor.
-     * @param TypeMapping $typeMapping
+     * @param TypeMapperInterface $typeMapping
      * @param Logger $logger
      * @param Repository $repository
      */
-    public function __construct(TypeMapping $typeMapping, Logger $logger, Repository $repository)
+    public function __construct(TypeMapperInterface $typeMapping, Logger $logger, Repository $repository)
     {
         $this->typeMapping = $typeMapping;
         $this->logger = $logger;

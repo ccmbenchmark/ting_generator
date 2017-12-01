@@ -32,7 +32,7 @@ class TypeMapping implements TypeMapperInterface
     /**
      * @param string $fieldType
      *
-     * @return null|string
+     * @return null|string string is one of PHPType::TYPE_* constant.
      */
     public function getPhpTypeFromFieldType($fieldType)
     {
