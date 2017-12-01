@@ -63,7 +63,10 @@ class TypeMapping implements TypeMapperInterface
      */
     private function isInteger($mysqlType)
     {
-        return preg_match('~^tinyint|smallint|mediumint|int|bigint|bit|float|double|decimal~', $mysqlType) === 1;
+        return preg_match(
+            '~^(?:tinyint|smallint|mediumint|int|bigint|bit|float|double|decimal)(?:\([0-9]+\))?$~',
+            $mysqlType
+        ) === 1;
     }
 
     /**
@@ -74,8 +77,8 @@ class TypeMapping implements TypeMapperInterface
     private function isString($mysqlType)
     {
         return preg_match(
-            '~^char|varchar|tinytext|text|mediumtext|longtext|json'.
-            '|binary|varbinary|tinyblob|blob|mediumblob|longblob|enum|set~',
+            '^(?:char|varchar|tinytext|text|mediumtext|longtext|json|binary|varbinary|tinyblob|'
+                . 'blob|mediumblob|longblob|enum|set)(?:\([0-9]+\))?$',
             $mysqlType
         ) === 1;
     }
@@ -87,7 +90,7 @@ class TypeMapping implements TypeMapperInterface
      */
     public function isJson($mysqlType)
     {
-        return preg_match('~^json~', $mysqlType) === 1;
+        return preg_match('~^json(?:\([0-9]+\))?$~', $mysqlType) === 1;
     }
 
     /**
@@ -97,6 +100,6 @@ class TypeMapping implements TypeMapperInterface
      */
     private function isDateTime($mysqlType)
     {
-        return preg_match('~^datetime|date|time|year|timestamp~', $mysqlType) === 1;
+        return preg_match('~^(?:datetime|date|time|year|timestamp)(?:\([0-9]+\))?$~', $mysqlType) === 1;
     }
 }
