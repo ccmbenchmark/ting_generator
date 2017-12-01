@@ -34,6 +34,7 @@ use CCMBenchmark\TingGenerator\Database\RepositoryFactory;
 use CCMBenchmark\TingGenerator\Database\TableDescription;
 use CCMBenchmark\TingGenerator\Generator\Repository;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -83,6 +84,11 @@ class TingGenerateCommand extends Command
      * @var int
      */
     private $generationMode;
+
+    /**
+     * @var ProgressBar
+     */
+    private $progressBar;
 
     /**
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
@@ -164,16 +170,34 @@ class TingGenerateCommand extends Command
         $entityNameFormatter = $this->configuration->getEntityNameFormatter();
         $repositoryNameFormatter = $this->configuration->getRepositoryNameFormatter();
 
+        $this->progressBar = new ProgressBar($output, count($tablesData));
+        $i = 0;
+
         /**
          * @var TableDescription $tableDescription
          */
         foreach ($tablesData as $tableDescription) {
-            $this->logger->info('----------------------------------------------');
-
+            $this->progressBar->clear();
             $success = $this->generate($tableDescription, $entityNameFormatter, $repositoryNameFormatter);
+
+            $this->progressBar->advance();
+
+            ++$i;
+
             if ($success === false) {
                 return 1;
             }
+        }
+
+        $this->progressBar->finish();
+
+        $this->logger->info('');
+        if ($this->shouldGenerateEntity() === true) {
+            $this->logger->info('Target directory for entities: ' . $this->configuration->getEntityDirectory());
+        }
+
+        if ($this->shouldGenerateRepository() === true) {
+            $this->logger->info('Target directory for repositories: ' . $this->configuration->getRepositoryDirectory());
         }
 
         return 0;
@@ -272,8 +296,6 @@ class TingGenerateCommand extends Command
      */
     private function generateEntity($entityName, $entityNamespace, TableDescription $tableDescription)
     {
-        $this->logger->info('Generate entity: ' . $entityName);
-
         $classGenerator = $this
             ->entityGenerator
             ->generateEntityCode($entityName, $entityNamespace, $tableDescription->getFieldsDescription())
@@ -299,8 +321,6 @@ class TingGenerateCommand extends Command
         TableDescription $tableDescription,
         $entityFullQualifiedName
     ) {
-        $this->logger->info('Generate repository: ' . $repositoryName);
-
         $classGenerator = $this
             ->repositoryGenerator
             ->generateRepositoryCode(
@@ -335,8 +355,6 @@ class TingGenerateCommand extends Command
                 ->error('You must specify a target directory for generated classes.');
             return false;
         }
-
-        $this->logger->info('Writing class in directory: ' . $targetDirectory);
 
         return $this
             ->classWriter
