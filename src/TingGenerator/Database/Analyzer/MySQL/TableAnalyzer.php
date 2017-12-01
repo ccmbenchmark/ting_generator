@@ -95,7 +95,6 @@ class TableAnalyzer implements TableAnalyzerInterface
             }
 
             $tablesDataList[$tableName] = $tableData;
-
         }
 
         return $tablesDataList;
