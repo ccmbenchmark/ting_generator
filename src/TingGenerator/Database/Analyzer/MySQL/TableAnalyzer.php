@@ -128,11 +128,31 @@ class TableAnalyzer implements TableAnalyzerInterface
             $tableData[] = new FieldDescription(
                 $this->typeMapping->getFromMysqlType($row['Type']),
                 $row['Field'],
-                $row['Key'] === 'PRI',
-                $row['Extra'] === 'auto_increment'
+                $this->isFieldPrimaryKey($row),
+                $this->isFieldAutoIncrement($row)
             );
         }
 
         return new TableDescription($tableName, $tableData);
+    }
+
+    /**
+     * @param array $row
+     *
+     * @return bool
+     */
+    private function isFieldPrimaryKey(array $row)
+    {
+        return $row['Key'] === 'PRI';
+    }
+
+    /**
+     * @param array $row
+     *
+     * @return bool
+     */
+    private function isFieldAutoIncrement(array $row)
+    {
+        return $row['Extra'] === 'auto_increment';
     }
 }
