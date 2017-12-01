@@ -190,7 +190,7 @@ class TingGenerateCommand extends Command
             );
         }
 
-        return true;
+        return false;
     }
 
     /**
