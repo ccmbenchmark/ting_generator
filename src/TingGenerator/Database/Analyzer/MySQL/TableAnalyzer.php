@@ -85,7 +85,7 @@ class TableAnalyzer implements TableAnalyzerInterface
 
         foreach ($result as $row) {
             $tableName = current($row);
-            if ($excludedTablesFilter($tableName) === true) {
+            if (is_callable($excludedTablesFilter) === true && $excludedTablesFilter($tableName) === true) {
                 continue;
             }
 
