@@ -125,7 +125,7 @@ class TableAnalyzer implements TableAnalyzerInterface
         $tableData = [];
         foreach ($result as $row) {
             $tableData[] = new FieldDescription(
-                $this->typeMapping->getFromMysqlType($row['Type']),
+                $this->typeMapping->getPhpTypeFromFieldType($row['Type']),
                 $row['Field'],
                 $this->isFieldPrimaryKey($row),
                 $this->isFieldAutoIncrement($row)

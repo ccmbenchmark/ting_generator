@@ -30,23 +30,23 @@ use CCMBenchmark\TingGenerator\Infrastructure\PHPType;
 class TypeMapping implements TypeMapperInterface
 {
     /**
-     * @param string $mysqlType
+     * @param string $fieldType
      *
      * @return null|string
      */
-    public function getFromMysqlType($mysqlType)
+    public function getPhpTypeFromFieldType($fieldType)
     {
-        $mysqlType = trim(mb_strtolower($mysqlType));
+        $fieldType = trim(mb_strtolower($fieldType));
 
-        if ($this->isInteger($mysqlType) === true) {
+        if ($this->isInteger($fieldType) === true) {
             return PHPType::TYPE_INT;
         }
 
-        if ($this->isString($mysqlType) === true || $this->isJson($mysqlType) === true) {
+        if ($this->isString($fieldType) === true || $this->isJson($fieldType) === true) {
             return PHPType::TYPE_STRING;
         }
 
-        if ($this->isDateTime($mysqlType) === true) {
+        if ($this->isDateTime($fieldType) === true) {
             return PHPType::TYPE_DATETIME;
         }
 
@@ -54,49 +54,49 @@ class TypeMapping implements TypeMapperInterface
     }
 
     /**
-     * @param string $mysqlType
+     * @param string $fieldType
      *
-     * @return bool Return true if $mysqlType is an integer, false if not.
+     * @return bool Return true if $fieldType is an integer, false if not.
      */
-    private function isInteger($mysqlType)
+    private function isInteger($fieldType)
     {
         return preg_match(
             '~^(?:tinyint|smallint|mediumint|int|bigint|bit|float|double|decimal)(?:\([0-9]+\))?$~',
-            $mysqlType
+            $fieldType
         ) === 1;
     }
 
     /**
-     * @param string $mysqlType
+     * @param string $fieldType
      *
-     * @return bool Return true if $mysqlType is a string, false if not.
+     * @return bool Return true if $fieldType is a string, false if not.
      */
-    private function isString($mysqlType)
+    private function isString($fieldType)
     {
         return preg_match(
             '~^(?:char|varchar|tinytext|text|mediumtext|longtext|json|binary|varbinary|tinyblob|'
                 . 'blob|mediumblob|longblob|enum|set)(?:\([0-9]+\))?$~',
-            $mysqlType
+            $fieldType
         ) === 1;
     }
 
     /**
-     * @param string $mysqlType
+     * @param string $fieldType
      *
-     * @return bool Return true if $mysqlType is a json, false if not.
+     * @return bool Return true if $fieldType is a json, false if not.
      */
-    public function isJson($mysqlType)
+    public function isJson($fieldType)
     {
-        return preg_match('~^json(?:\([0-9]+\))?$~', $mysqlType) === 1;
+        return preg_match('~^json(?:\([0-9]+\))?$~', $fieldType) === 1;
     }
 
     /**
-     * @param string $mysqlType
+     * @param string $fieldType
      *
-     * @return bool Return true if $mysqlType is a datetime, false if not.
+     * @return bool Return true if $fieldType is a datetime, false if not.
      */
-    private function isDateTime($mysqlType)
+    private function isDateTime($fieldType)
     {
-        return preg_match('~^(?:datetime|date|time|year|timestamp)(?:\([0-9]+\))?$~', $mysqlType) === 1;
+        return preg_match('~^(?:datetime|date|time|year|timestamp)(?:\([0-9]+\))?$~', $fieldType) === 1;
     }
 }

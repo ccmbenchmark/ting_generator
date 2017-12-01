@@ -27,9 +27,9 @@ namespace CCMBenchmark\TingGenerator\Database\Analyzer;
 interface TypeMapperInterface
 {
     /**
-     * @param string $mysqlType
+     * @param string $fieldType
      *
      * @return null|string
      */
-    public function getFromMysqlType($mysqlType);
+    public function getPhpTypeFromFieldType($fieldType);
 }
