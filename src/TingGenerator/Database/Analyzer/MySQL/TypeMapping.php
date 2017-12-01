@@ -27,7 +27,7 @@ namespace CCMBenchmark\TingGenerator\Database\Analyzer\MySQL;
 use CCMBenchmark\TingGenerator\Database\Analyzer\TypeMapperInterface;
 use CCMBenchmark\TingGenerator\Infrastructure\PHPType;
 
-class TypeMapping implements TypeMapperInterface
+final class TypeMapping implements TypeMapperInterface
 {
     /**
      * @param string $fieldType

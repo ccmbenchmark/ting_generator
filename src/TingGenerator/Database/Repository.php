@@ -29,7 +29,7 @@ use CCMBenchmark\Ting\Repository\MetadataInitializer;
 use CCMBenchmark\Ting\Repository\Repository as TingRepository;
 use CCMBenchmark\Ting\Serializer\SerializerFactoryInterface;
 
-class Repository extends TingRepository implements MetadataInitializer
+final class Repository extends TingRepository implements MetadataInitializer
 {
     /**
      * @param SerializerFactoryInterface $serializerFactory
