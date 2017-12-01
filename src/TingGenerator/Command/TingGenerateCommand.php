@@ -208,7 +208,7 @@ class TingGenerateCommand extends Command
      * @throws \Pimple\Exception\UnknownIdentifierException
      * @throws \RuntimeException
      *
-     * @return array
+     * @return TableDescription[]|null
      */
     private function getTablesData()
     {
