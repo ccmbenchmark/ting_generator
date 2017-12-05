@@ -296,6 +296,8 @@ class TingGenerateCommand extends Command
      */
     private function generateEntity($entityName, $entityNamespace, TableDescription $tableDescription)
     {
+        $this->logger->info('Generate entity: ' . $entityName);
+
         $classGenerator = $this
             ->entityGenerator
             ->generateEntityCode($entityName, $entityNamespace, $tableDescription->getFieldsDescription())
@@ -321,6 +323,8 @@ class TingGenerateCommand extends Command
         TableDescription $tableDescription,
         $entityFullQualifiedName
     ) {
+        $this->logger->info('Generate repository: ' . $repositoryName);
+
         $classGenerator = $this
             ->repositoryGenerator
             ->generateRepositoryCode(
