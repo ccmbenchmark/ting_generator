@@ -34,7 +34,7 @@ use CCMBenchmark\TingGenerator\Database\TableDescription;
 use CCMBenchmark\TingGenerator\Database\Repository;
 use CCMBenchmark\TingGenerator\Log\Logger;
 
-class TableAnalyzer implements TableAnalyzerInterface
+final class TableAnalyzer implements TableAnalyzerInterface
 {
     /**
      * @var TypeMapperInterface
