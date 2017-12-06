@@ -22,10 +22,6 @@
  *
  **********************************************************************/
 
-/**
- * sudo -E php application.php ting:generate --conf=/var/www/ting_generator/sample/conf.php --mode=3
- */
-
 namespace CCMBenchmark\TingGenerator\Command;
 
 use CCMBenchmark\Ting\Services;
