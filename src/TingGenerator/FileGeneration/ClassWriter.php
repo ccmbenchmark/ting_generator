@@ -24,7 +24,7 @@
 
 namespace CCMBenchmark\TingGenerator\FileGeneration;
 
-use CCMBenchmark\TingGenerator\Log\Logger;
+use Psr\Log\LoggerInterface;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\Exception\RuntimeException;
 use Zend\Code\Generator\FileGenerator;
@@ -51,9 +51,9 @@ class ClassWriter
     /**
      * ClassWriter constructor.
      * @param FileGenerator $fileGenerator
-     * @param Logger $logger
+     * @param LoggerInterface $logger
      */
-    public function __construct(FileGenerator $fileGenerator, Logger $logger)
+    public function __construct(FileGenerator $fileGenerator, LoggerInterface $logger)
     {
         $this->baseFileGenerator = $fileGenerator;
         $this->logger = $logger;

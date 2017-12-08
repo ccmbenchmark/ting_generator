@@ -27,7 +27,6 @@ namespace CCMBenchmark\TingGenerator\Generator;
 use CCMBenchmark\Ting\Entity\NotifyProperty;
 use CCMBenchmark\Ting\Entity\NotifyPropertyInterface;
 use CCMBenchmark\TingGenerator\Infrastructure\PHPType;
-use CCMBenchmark\TingGenerator\Log\Logger;
 use CCMBenchmark\TingGenerator\Infrastructure\StringFormatter;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\DocBlock\Tag\GenericTag;
@@ -38,6 +37,7 @@ use Zend\Code\Generator\Exception\InvalidArgumentException;
 use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\PropertyGenerator;
 use CCMBenchmark\TingGenerator\Database\FieldDescription;
+use Psr\Log\LoggerInterface;
 
 class Entity
 {
@@ -52,7 +52,7 @@ class Entity
     private $classGenerator;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -64,11 +64,14 @@ class Entity
     /**
      * Generator constructor.
      * @param ClassGenerator $classGenerator
-     * @param Logger $logger
+     * @param LoggerInterface $logger
      * @param StringFormatter $stringFormatter
      */
-    public function __construct(ClassGenerator $classGenerator, Logger $logger, StringFormatter $stringFormatter)
-    {
+    public function __construct(
+        ClassGenerator $classGenerator,
+        LoggerInterface $logger,
+        StringFormatter $stringFormatter
+    ) {
         $this->baseClassGenerator = $classGenerator;
         $this->logger = $logger;
         $this->stringFormatter = $stringFormatter;

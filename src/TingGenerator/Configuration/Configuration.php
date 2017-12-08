@@ -27,6 +27,7 @@ namespace CCMBenchmark\TingGenerator\Configuration;
 use CCMBenchmark\TingGenerator\Database\ConnectionData;
 use CCMBenchmark\TingGenerator\Log\Logger;
 use CCMBenchmark\TingGenerator\Configuration\Exception\MissingParameterException;
+use Psr\Log\LoggerInterface;
 
 class Configuration
 {
@@ -36,7 +37,7 @@ class Configuration
     private $configurationData;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -48,8 +49,9 @@ class Configuration
     /**
      * Configuration constructor.
      * @param array $configurationData
+     * @param LoggerInterface $logger
      */
-    public function __construct(array $configurationData, Logger $logger)
+    public function __construct(array $configurationData, LoggerInterface $logger)
     {
         $this->configurationData = $configurationData;
         $this->logger = $logger;

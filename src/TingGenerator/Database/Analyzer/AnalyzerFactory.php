@@ -27,7 +27,7 @@ namespace CCMBenchmark\TingGenerator\Database\Analyzer;
 use CCMBenchmark\TingGenerator\Database\Analyzer\MySQL\TableAnalyzer;
 use CCMBenchmark\TingGenerator\Database\Analyzer\MySQL\TypeMapping;
 use CCMBenchmark\TingGenerator\Database\RepositoryFactory;
-use CCMBenchmark\TingGenerator\Log\Logger;
+use Psr\Log\LoggerInterface;
 
 class AnalyzerFactory
 {
@@ -37,16 +37,16 @@ class AnalyzerFactory
     private $repositoryFactory;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
     /**
      * AnalyzerFactory constructor.
      * @param RepositoryFactory $repositoryFactory
-     * @param Logger $logger
+     * @param LoggerInterface $logger
      */
-    public function __construct(RepositoryFactory $repositoryFactory, Logger $logger)
+    public function __construct(RepositoryFactory $repositoryFactory, LoggerInterface $logger)
     {
         $this->repositoryFactory = $repositoryFactory;
         $this->logger = $logger;

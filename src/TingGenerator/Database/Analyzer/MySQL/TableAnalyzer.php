@@ -32,7 +32,7 @@ use CCMBenchmark\TingGenerator\Database\FieldDescription;
 use CCMBenchmark\TingGenerator\Database\Analyzer\TableAnalyzerInterface;
 use CCMBenchmark\TingGenerator\Database\TableDescription;
 use CCMBenchmark\TingGenerator\Database\Repository;
-use CCMBenchmark\TingGenerator\Log\Logger;
+use Psr\Log\LoggerInterface;
 
 final class TableAnalyzer implements TableAnalyzerInterface
 {
@@ -42,7 +42,7 @@ final class TableAnalyzer implements TableAnalyzerInterface
     private $typeMapping;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -54,10 +54,10 @@ final class TableAnalyzer implements TableAnalyzerInterface
     /**
      * TableAnalyzer constructor.
      * @param TypeMapperInterface $typeMapping
-     * @param Logger $logger
+     * @param LoggerInterface $logger
      * @param Repository $repository
      */
-    public function __construct(TypeMapperInterface $typeMapping, Logger $logger, Repository $repository)
+    public function __construct(TypeMapperInterface $typeMapping, LoggerInterface $logger, Repository $repository)
     {
         $this->typeMapping = $typeMapping;
         $this->logger = $logger;

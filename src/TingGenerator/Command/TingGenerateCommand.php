@@ -33,15 +33,13 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use CCMBenchmark\TingGenerator\Generator\Entity;
 use CCMBenchmark\TingGenerator\FileGeneration\ClassWriter;
 use CCMBenchmark\TingGenerator\Infrastructure\StringFormatter;
-use CCMBenchmark\TingGenerator\Log\Logger;
 use CCMBenchmark\TingGenerator\Configuration\ConfigurationLoader;
-use CCMBenchmark\TingGenerator\Database\Analyzer\MySQL\TableAnalyzer;
 use CCMBenchmark\TingGenerator\Configuration\Configuration;
-use CCMBenchmark\TingGenerator\Database\Analyzer\MySQL\TypeMapping;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\FileGenerator;
 
@@ -52,7 +50,7 @@ class TingGenerateCommand extends Command
     const MODE_ALL = 3;
 
     /**
-     * @var Logger
+     * @var ConsoleLogger
      */
     private $logger;
 
@@ -143,7 +141,7 @@ class TingGenerateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->logger = new Logger($output);
+        $this->logger = new ConsoleLogger($output);
         $this->entityGenerator = new Entity(new ClassGenerator(), $this->logger, new StringFormatter());
         $this->repositoryGenerator = new Repository(new ClassGenerator(), $this->logger, new StringFormatter());
         $this->classWriter = new ClassWriter(new FileGenerator(), $this->logger);

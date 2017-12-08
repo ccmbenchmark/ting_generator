@@ -30,7 +30,7 @@ use CCMBenchmark\Ting\Repository\MetadataInitializer;
 use CCMBenchmark\Ting\Serializer\SerializerFactoryInterface;
 use CCMBenchmark\TingGenerator\Database\TableDescription;
 use Zend\Code\Generator\ClassGenerator;
-use CCMBenchmark\TingGenerator\Log\Logger;
+use Psr\Log\LoggerInterface;
 use CCMBenchmark\TingGenerator\Infrastructure\StringFormatter;
 use Zend\Code\Generator\DocBlock\Tag\ParamTag;
 use Zend\Code\Generator\DocBlock\Tag\ReturnTag;
@@ -54,7 +54,7 @@ class Repository
     private $classGenerator;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -66,11 +66,14 @@ class Repository
     /**
      * Generator constructor.
      * @param ClassGenerator $classGenerator
-     * @param Logger $logger
+     * @param LoggerInterface $logger
      * @param StringFormatter $stringFormatter
      */
-    public function __construct(ClassGenerator $classGenerator, Logger $logger, StringFormatter $stringFormatter)
-    {
+    public function __construct(
+        ClassGenerator $classGenerator,
+        LoggerInterface $logger,
+        StringFormatter $stringFormatter
+    ) {
         $this->baseClassGenerator = $classGenerator;
         $this->logger = $logger;
         $this->stringFormatter = $stringFormatter;

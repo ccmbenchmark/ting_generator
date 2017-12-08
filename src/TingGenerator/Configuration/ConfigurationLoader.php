@@ -24,20 +24,20 @@
 
 namespace CCMBenchmark\TingGenerator\Configuration;
 
-use CCMBenchmark\TingGenerator\Log\Logger;
+use Psr\Log\LoggerInterface;
 
 class ConfigurationLoader
 {
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
     /**
      * ConfigurationLoader constructor.
-     * @param Logger $logger
+     * @param LoggerInterface $logger
      */
-    public function __construct(Logger $logger)
+    public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
