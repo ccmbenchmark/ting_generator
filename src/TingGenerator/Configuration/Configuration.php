@@ -64,7 +64,7 @@ class Configuration
      *
      * @throws MissingParameterException
      *
-     * @return mixed
+     * @return int|string
      */
     private function getMandatoryParameter($parameterName)
     {
@@ -114,11 +114,11 @@ class Configuration
     /**
      * @throws MissingParameterException
      *
-     * @return string
+     * @return int
      */
     public function getPort()
     {
-        return (string) $this->getMandatoryParameter('port');
+        return (int) $this->getMandatoryParameter('port');
     }
 
     /**
