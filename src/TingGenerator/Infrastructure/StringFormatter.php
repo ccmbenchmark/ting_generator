@@ -40,6 +40,7 @@ class StringFormatter
     /**
      * @param string $string
      * @param string $encoding
+     *
      * @return string
      */
     public function ucfirst($string, $encoding = 'utf8')
