@@ -24,7 +24,7 @@
 
 namespace CCMBenchmark\TingGenerator\Database;
 
-class ConnectionData
+final class ConnectionData
 {
     /**
      * @var string

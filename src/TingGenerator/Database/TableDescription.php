@@ -24,7 +24,7 @@
 
 namespace CCMBenchmark\TingGenerator\Database;
 
-class TableDescription
+final class TableDescription
 {
     /**
      * @var string
