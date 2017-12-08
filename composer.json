@@ -1,6 +1,11 @@
 {
   "name": "ccmbenchmark/tinggenerator",
   "description": "Generate entities and repositories for Ting",
+  "autoload": {
+    "psr-4": {
+      "CCMBenchmark\\TingGenerator\\": "src/TingGenerator"
+    }
+  },
   "require": {
     "php": ">=5.5",
     "ext-mbstring": "*",
