@@ -259,7 +259,7 @@ class Configuration
     public function getRepositoryDirectory()
     {
         try {
-            return (string)$this->getMandatoryParameter('repositoriesDirectory');
+            return (string) $this->getMandatoryParameter('repositoriesDirectory');
         } catch (MissingParameterException $exception) {
             $this->logger->error($exception->getMessage());
             return '';
