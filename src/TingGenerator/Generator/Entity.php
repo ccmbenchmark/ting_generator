@@ -218,7 +218,7 @@ class Entity
             . "\n"
             . 'return $this;';
 
-        $methodName = 'set' . ucfirst($propertyName);
+        $methodName = 'set' . $this->stringFormatter->ucfirst($propertyName);
         try {
             $this->classGenerator
                 ->addMethodFromGenerator(
@@ -259,7 +259,7 @@ class Entity
         }
         $getterBody .= ' $this->' . $propertyName . ';';
 
-        $methodName = 'get' . ucfirst($propertyName);
+        $methodName = 'get' . $this->stringFormatter->ucfirst($propertyName);
         try {
             $this->classGenerator
                 ->addMethodFromGenerator(
