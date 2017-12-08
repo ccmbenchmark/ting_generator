@@ -24,6 +24,10 @@
 
 namespace CCMBenchmark\TingGenerator\Generator;
 
+use CCMBenchmark\Ting\Exception;
+use CCMBenchmark\Ting\Repository\Metadata;
+use CCMBenchmark\Ting\Repository\MetadataInitializer;
+use CCMBenchmark\Ting\Serializer\SerializerFactoryInterface;
 use CCMBenchmark\TingGenerator\Database\TableDescription;
 use Zend\Code\Generator\ClassGenerator;
 use CCMBenchmark\TingGenerator\Log\Logger;
@@ -35,6 +39,7 @@ use Zend\Code\Generator\DocBlockGenerator;
 use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\ParameterGenerator;
 use CCMBenchmark\TingGenerator\Database\FieldDescription;
+use CCMBenchmark\Ting\Repository\Repository as TingRepository;
 
 class Repository
 {
@@ -128,14 +133,13 @@ class Repository
         $this->classGenerator
             ->setName((string) $repositoryName)
             ->setNamespaceName((string) $repositoryNamespace)
-            ->addUse('CCMBenchmark\\Ting\\Exception')
-            ->addUse('AppBundle\\Domain\\Client\\Entity')
-            ->addUse('CCMBenchmark\\Ting\\Repository\\Metadata')
-            ->addUse('CCMBenchmark\\Ting\\Repository\\MetadataInitializer')
-            ->addUse('CCMBenchmark\\Ting\\Repository\\Repository')
-            ->addUse('CCMBenchmark\\Ting\\Serializer\\SerializerFactoryInterface')
-            ->setExtendedClass('CCMBenchmark\\Ting\\Repository\\Repository')
-            ->setImplementedInterfaces(['MetadataInitializer']);
+            ->addUse(Exception::class)
+            ->addUse(Metadata::class)
+            ->addUse(MetadataInitializer::class)
+            ->addUse(TingRepository::class)
+            ->addUse(SerializerFactoryInterface::class)
+            ->setExtendedClass(TingRepository::class)
+            ->setImplementedInterfaces([MetadataInitializer::class]);
 
         return $this;
     }
@@ -158,7 +162,7 @@ class Repository
                 'parameters' => [
                     ParameterGenerator::fromArray([
                         'name' => 'serializerFactory',
-                        'type' => 'SerializerFactoryInterface'
+                        'type' => SerializerFactoryInterface::class
                     ]),
                     ParameterGenerator::fromArray([
                         'name' => 'options',
@@ -190,7 +194,7 @@ class Repository
     {
         $body =
             '$metadata = new Metadata($serializerFactory);'
-            . "\n" . '$metadata->setEntity(' . $entityFullQualifiedName . '::class);'
+            . "\n" . '$metadata->setEntity(' . $this->formatEntityNamespace($entityFullQualifiedName) . '::class);'
             . "\n" . '$metadata->setConnectionName($options[\'connection\']);'
             . "\n" . '$metadata->setDatabase($options[\'database\']);'
             . "\n" . '$metadata->setTable(\'' . $tableDescription->getName() . '\');'
@@ -233,5 +237,21 @@ class Repository
         $body .= "\n" . '    ])';
 
         return $body;
+    }
+
+    /**
+     * @param string $entityNamespace
+     *
+     * @return string
+     */
+    private function formatEntityNamespace($entityNamespace)
+    {
+        $entityNamespace = (string) $entityNamespace;
+
+        if (preg_match('~^\/~', $entityNamespace) === 1) {
+            return $entityNamespace;
+        }
+
+        return '\\' . $entityNamespace;
     }
 }

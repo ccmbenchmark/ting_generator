@@ -24,6 +24,8 @@
 
 namespace CCMBenchmark\TingGenerator\Generator;
 
+use CCMBenchmark\Ting\Entity\NotifyProperty;
+use CCMBenchmark\Ting\Entity\NotifyPropertyInterface;
 use CCMBenchmark\TingGenerator\Infrastructure\PHPType;
 use CCMBenchmark\TingGenerator\Log\Logger;
 use CCMBenchmark\TingGenerator\Infrastructure\StringFormatter;
@@ -123,9 +125,9 @@ class Entity
             $this->classGenerator
                 ->setName($entityName)
                 ->setNamespaceName($namespace)
-                ->addUse('CCMBenchmark\\Ting\\Entity\\NotifyPropertyInterface')
-                ->addUse('CCMBenchmark\\Ting\\Entity\\NotifyProperty')
-                ->setImplementedInterfaces(['CCMBenchmark\\Ting\\Entity\\NotifyPropertyInterface'])
+                ->addUse(NotifyPropertyInterface::class)
+                ->addUse(NotifyProperty::class)
+                ->setImplementedInterfaces([NotifyPropertyInterface::class])
                 ->addTrait('NotifyProperty');
         } catch (InvalidArgumentException $exception) {
             $this->logger->error($exception->getMessage());
