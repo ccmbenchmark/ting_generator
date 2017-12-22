@@ -226,7 +226,7 @@ class Configuration
     public function getEntityDirectory()
     {
         try {
-            return (string)$this->getMandatoryParameter('entitiesDirectory');
+            return (string)$this->getMandatoryParameter('entityDirectory');
         } catch (MissingParameterException $exception) {
             $this->logger->error($exception->getMessage());
             return '';
@@ -261,7 +261,7 @@ class Configuration
     public function getRepositoryDirectory()
     {
         try {
-            return (string) $this->getMandatoryParameter('repositoriesDirectory');
+            return (string) $this->getMandatoryParameter('repositoryDirectory');
         } catch (MissingParameterException $exception) {
             $this->logger->error($exception->getMessage());
             return '';
