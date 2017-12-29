@@ -25,6 +25,7 @@
 namespace tests\units\CCMBenchmark\TingGenerator\Database\Analyzer\MySQL;
 
 use CCMBenchmark\Ting\Query\Query;
+use CCMBenchmark\Ting\Query\QueryException;
 use CCMBenchmark\TingGenerator\Database\Analyzer\TypeMapperInterface;
 use CCMBenchmark\TingGenerator\Database\FieldDescription;
 use CCMBenchmark\TingGenerator\Database\Repository;
@@ -118,6 +119,91 @@ class TableAnalyzer extends atoum
             ->and($this->newTestedInstance($this->typeMapping, $this->logger, $this->repository))
                 ->array($this->testedInstance->getTablesData(uniqid('databasename')))
                     ->isEqualTo($resultExpected)
+        ;
+    }
+
+    public function testGetTablesDataReturnEmptyArrayOnQueryExceptionWhenRetrievingTablesList()
+    {
+        $this
+            ->given($queryException = new QueryException(uniqid('message')))
+            ->and($this->calling($this->query)->query = function () use ($queryException) {
+                throw $queryException;
+            })
+            ->and($this->calling($this->repository)->getQuery = $this->query)
+            ->and($this->calling($this->repository)->getCollection = null)
+            ->and($this->newTestedInstance($this->typeMapping, $this->logger, $this->repository))
+                ->array($this->testedInstance->getTablesData(uniqid('databasename')))
+                    ->isEmpty()
+            ->mock($this->logger)
+                ->call('error')
+                    ->withIdenticalArguments($queryException->getMessage())
+                        ->once();
+    }
+
+    public function testGetTablesDataHandleExcludeFilter()
+    {
+        $this
+            ->given()
+            ->and($table1Name = uniqid('table1'))
+            ->and($tablesList = [['Tables_in_auth_ccm_net' => $table1Name]])
+            ->and($this->calling($this->query)->query[1] = $tablesList)
+            ->and($table1 = [
+                [
+                    'Field' => uniqid('field'),
+                    'Type' => uniqid('type'),
+                    'Extra' => 'auto_increment',
+                    'Key'  => 'PRI'
+                ],
+                [
+                    'Field' => uniqid('field'),
+                    'Type' => uniqid('type'),
+                    'Extra' => '',
+                    'Key'  => ''
+                ]
+            ])
+            ->and($this->calling($this->query)->query[2] = $table1)
+
+            ->and($typeField1 = uniqid('type'))
+            ->and($this->calling($this->typeMapping)->getPhpTypeFromFieldType[1] = $typeField1)
+            ->and($typeField2 = uniqid('type'))
+            ->and($this->calling($this->typeMapping)->getPhpTypeFromFieldType[2] = $typeField2)
+
+            ->and($excludedTablesFilter = function ($tableName) use ($table1Name) {
+                return $tableName === $table1Name;
+            })
+
+            ->and($resultExpected = [])
+
+            ->and($this->calling($this->repository)->getQuery = $this->query)
+            ->and($this->calling($this->repository)->getCollection = null)
+
+            ->and($this->newTestedInstance($this->typeMapping, $this->logger, $this->repository))
+                ->array($this->testedInstance->getTablesData(uniqid('databasename'), $excludedTablesFilter))
+                    ->isEqualTo($resultExpected)
+        ;
+    }
+
+    public function testGetTablesDataReturnEmptyArrayOnQueryExceptionWhenRetrievingTableData()
+    {
+        $this
+            ->given()
+            ->and($table1Name = uniqid('table1'))
+            ->and($tablesList = [['Tables_in_auth_ccm_net' => $table1Name]])
+            ->and($this->calling($this->query)->query[1] = $tablesList)
+
+            ->and($this->calling($this->repository)->getQuery = $this->query)
+            ->and($this->calling($this->repository)->getCollection = null)
+
+            ->and($queryException = new QueryException(uniqid('message')))
+            ->and($this->calling($this->query)->query[2] = function () use ($queryException) {
+                throw $queryException;
+            })
+            ->and($this->newTestedInstance($this->typeMapping, $this->logger, $this->repository))
+                ->array($this->testedInstance->getTablesData(uniqid('databasename')))
+                    ->isEmpty()
+            ->mock($this->logger)
+                ->call('error')
+                    ->withIdenticalArguments($queryException->getMessage())
         ;
     }
 }
