@@ -53,7 +53,7 @@ class AnalyzerFactory
     }
 
     /**
-     * @param string$type
+     * @param string $type
      *
      * @return TableAnalyzerInterface|null
      */
