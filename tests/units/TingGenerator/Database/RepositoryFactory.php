@@ -38,11 +38,6 @@ use CCMBenchmark\Ting\Repository\RepositoryFactory as TingRepositoryFactory;
 class RepositoryFactory extends atoum
 {
     /**
-     * @var Database\ConnectionData
-     */
-    private $connectionData;
-
-    /**
      * @var ConnectionPoolInterface
      */
     private $connectionPool;
