@@ -103,7 +103,7 @@ class FieldDescription extends atoum
     {
         $this
             ->createTestedInstance()
-            ->boolean($this->testedInstance->isPrimary())
+            ->boolean($this->testedInstance->isAutoIncrement())
                 ->isIdenticalTo($this->isAutoIncrement);
     }
 }
