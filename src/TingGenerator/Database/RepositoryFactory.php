@@ -72,7 +72,7 @@ class RepositoryFactory
         
         $this->metadataRepository->batchLoadMetadata(
             'CCMBenchmark\TingGenerator\Database',
-            __DIR__ . '/../Database/Repository.php',
+            __DIR__ . '/Repository.php',
             [
                 'CCMBenchmark\TingGenerator\Database\Repository' => [
                     'connection' => 'main',
