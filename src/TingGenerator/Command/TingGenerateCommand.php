@@ -29,6 +29,7 @@ use CCMBenchmark\TingGenerator\Database\Analyzer\AnalyzerFactory;
 use CCMBenchmark\TingGenerator\Database\RepositoryFactory;
 use CCMBenchmark\TingGenerator\Database\TableDescription;
 use CCMBenchmark\TingGenerator\FileGeneration\FileGeneratorFactory;
+use CCMBenchmark\TingGenerator\Generator\ClassGeneratorFactory;
 use CCMBenchmark\TingGenerator\Generator\Repository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -143,7 +144,7 @@ class TingGenerateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->logger = new ConsoleLogger($output);
-        $this->entityGenerator = new Entity(new ClassGenerator(), $this->logger, new StringFormatter());
+        $this->entityGenerator = new Entity(new ClassGeneratorFactory(), $this->logger, new StringFormatter());
         $this->repositoryGenerator = new Repository(new ClassGenerator(), $this->logger, new StringFormatter());
         $this->classWriter = new ClassWriter(new FileGeneratorFactory(), $this->logger);
 
