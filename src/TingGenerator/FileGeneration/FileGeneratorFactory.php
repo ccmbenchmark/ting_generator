@@ -26,7 +26,7 @@ namespace CCMBenchmark\TingGenerator\FileGeneration;
 
 use Zend\Code\Generator\FileGenerator;
 
-final class FileGeneratorFactory
+class FileGeneratorFactory
 {
     /**
      * @return FileGenerator
