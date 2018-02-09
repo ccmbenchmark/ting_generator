@@ -27,6 +27,7 @@ namespace tests\units\CCMBenchmark\TingGenerator\Generator;
 use CCMBenchmark\Ting\Entity\NotifyProperty;
 use CCMBenchmark\Ting\Entity\NotifyPropertyInterface;
 use CCMBenchmark\TingGenerator\Database\FieldDescription;
+use CCMBenchmark\TingGenerator\Infrastructure\PHPType;
 use mageekguy\atoum;
 use Zend\Code\Generator\ClassGenerator;
 use Psr\Log\LoggerInterface;
@@ -188,16 +189,14 @@ class Entity extends atoum
                                 ->once()
                         ->call('addMethodFromGenerator')
                             ->withArguments(
-                                [
-                                    MethodGenerator::fromArray([
-                                        'name' => 'get' . $this->stringFormatter->ucfirst($propertyName),
-                                        'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
-                                        'body' => $getterBody,
-                                        'docblock' => DocBlockGenerator::fromArray([
-                                            'tags' => [new ReturnTag([$description->getType()])]
-                                        ])
+                                MethodGenerator::fromArray([
+                                    'name' => 'get' . $this->stringFormatter->ucfirst($propertyName),
+                                    'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
+                                    'body' => $getterBody,
+                                    'docblock' => DocBlockGenerator::fromArray([
+                                        'tags' => [new ReturnTag([$description->getType()])]
                                     ])
-                                ]
+                                ])
                             )
                                 ->once()
                 ;
@@ -205,5 +204,58 @@ class Entity extends atoum
                 echo $exception->getMessage();
             }
         }
+    }
+
+    /**
+     * @param string $type
+     */
+    private function generateEntityCodeHandle($type)
+    {
+        try {
+            $this
+                ->given($entityName = uniqid('entityName'))
+                ->and($namespace = uniqid('namespace'))
+                ->and(
+                    $entityDescription =
+                        new FieldDescription(
+                            $type,
+                            uniqid('name'),
+                            rand(0, 1) === 0,
+                            rand(0, 1) === 0
+                        )
+                )
+                ->and($this->calling($this->classGeneratorFactory)->get = $this->classGenerator)
+                ->and($propertyName = lcfirst($this->stringFormatter->camelize($entityDescription->getName())))
+                ->and($getterBody = 'return (' . $type . ') $this->' . $propertyName . ';')
+                ->and($this->newTestedInstance($this->classGeneratorFactory, $this->logger, $this->stringFormatter))
+                ->object($this->testedInstance->generateEntityCode($entityName, $namespace, [$entityDescription]))
+                    ->isTestedInstance()
+                ->mock($this->classGenerator)
+                    ->call('addMethodFromGenerator')
+                        ->withArguments(
+                            MethodGenerator::fromArray([
+                                'name' => 'get' . $this->stringFormatter->ucfirst($propertyName),
+                                'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
+                                'body' => $getterBody,
+                                'docblock' => DocBlockGenerator::fromArray([
+                                    'tags' => [new ReturnTag([$entityDescription->getType()])]
+                                ])
+                            ])
+                        )
+                            ->once()
+            ;
+        } catch (InvalidArgumentException $exception) {
+            echo $exception->getMessage();
+        }
+    }
+
+    public function testGenerateEntityCodeHandleInteger()
+    {
+        $this->generateEntityCodeHandle(PHPType::TYPE_INT);
+    }
+
+    public function testGenerateEntityCodeHandleString()
+    {
+        $this->generateEntityCodeHandle(PHPType::TYPE_STRING);
     }
 }
