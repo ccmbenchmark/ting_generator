@@ -144,8 +144,9 @@ class TingGenerateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->logger = new ConsoleLogger($output);
-        $this->entityGenerator = new Entity(new ClassGeneratorFactory(), $this->logger, new StringFormatter());
-        $this->repositoryGenerator = new Repository(new ClassGenerator(), $this->logger, new StringFormatter());
+        $classGeneratorFactory = new ClassGeneratorFactory();
+        $this->entityGenerator = new Entity($classGeneratorFactory, $this->logger, new StringFormatter());
+        $this->repositoryGenerator = new Repository($classGeneratorFactory, $this->logger, new StringFormatter());
         $this->classWriter = new ClassWriter(new FileGeneratorFactory(), $this->logger);
 
         $confOption = $input->getOption('conf');
