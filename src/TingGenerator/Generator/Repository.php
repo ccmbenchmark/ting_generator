@@ -44,9 +44,9 @@ use CCMBenchmark\Ting\Repository\Repository as TingRepository;
 class Repository
 {
     /**
-     * @var ClassGenerator
+     * @var ClassGeneratorFactory
      */
-    private $baseClassGenerator;
+    private $classGeneratorFactory;
 
     /**
      * @var ClassGenerator
@@ -65,16 +65,16 @@ class Repository
 
     /**
      * Generator constructor.
-     * @param ClassGenerator $classGenerator
+     * @param ClassGeneratorFactory $classGeneratorFactory
      * @param LoggerInterface $logger
      * @param StringFormatter $stringFormatter
      */
     public function __construct(
-        ClassGenerator $classGenerator,
+        ClassGeneratorFactory $classGeneratorFactory,
         LoggerInterface $logger,
         StringFormatter $stringFormatter
     ) {
-        $this->baseClassGenerator = $classGenerator;
+        $this->classGeneratorFactory = $classGeneratorFactory;
         $this->logger = $logger;
         $this->stringFormatter = $stringFormatter;
         $this->initializeClassGenerator();
@@ -88,7 +88,7 @@ class Repository
      */
     private function initializeClassGenerator()
     {
-        $this->classGenerator = clone $this->baseClassGenerator;
+        $this->classGenerator = $this->classGeneratorFactory->get();
 
         return $this;
     }
