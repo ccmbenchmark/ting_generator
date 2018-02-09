@@ -53,7 +53,7 @@ class Entity extends atoum
     private $classGenerator;
 
     /**
-     * @var ClassGeneratorFactory
+     * @var \CCMBenchmark\TingGenerator\Generator\ClassGeneratorFactory
      */
     private $classGeneratorFactory;
 
