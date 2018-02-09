@@ -258,4 +258,59 @@ class Entity extends atoum
     {
         $this->generateEntityCodeHandle(PHPType::TYPE_STRING);
     }
+
+    public function testGenerateEntityClonePropertyInSetter()
+    {
+        try {
+            $this
+                ->given($entityName = uniqid('entityName'))
+                ->and($namespace = uniqid('namespace'))
+                ->and(
+                    $entityDescription =
+                        new FieldDescription(
+                            PHPType::TYPE_DATETIME,
+                            uniqid('name'),
+                            rand(0, 1) === 0,
+                            rand(0, 1) === 0
+                        )
+                )
+                ->and($this->calling($this->classGeneratorFactory)->get = $this->classGenerator)
+                ->and($propertyName = lcfirst($this->stringFormatter->camelize($entityDescription->getName())))
+                ->and($parameterName = '$clone')
+                ->and($setterBody =
+                    '$clone = clone $' . $propertyName . ';' . "\n"
+                    . '$this->propertyChanged(\'' . $propertyName . '\', $this->' . $propertyName . ', '
+                    . $parameterName . ');'
+                    . "\n"
+                    . '$this->' . $propertyName . ' = ' . $parameterName . ';'
+                    . "\n"
+                    . "\n"
+                    . 'return $this;')
+                ->and($this->newTestedInstance($this->classGeneratorFactory, $this->logger, $this->stringFormatter))
+                ->object($this->testedInstance->generateEntityCode($entityName, $namespace, [$entityDescription]))
+                ->isTestedInstance()
+                ->mock($this->classGenerator)
+                    ->call('addMethodFromGenerator')
+                        ->withArguments(
+                            MethodGenerator::fromArray([
+                                'name'       => 'set' . $this->stringFormatter->ucfirst(
+                                    $this->stringFormatter->camelize($entityDescription->getName())
+                                ),
+                                'parameters' => [$propertyName],
+                                'visibility' => MethodGenerator::VISIBILITY_PUBLIC,
+                                'body'       => $setterBody,
+                                'docblock'   => DocBlockGenerator::fromArray([
+                                    'tags' => [
+                                        new ParamTag($propertyName, [$entityDescription->getType()]),
+                                        new ReturnTag(['$this'])
+                                    ]
+                                ])
+                            ])
+                        )
+                            ->once()
+            ;
+        } catch (InvalidArgumentException $exception) {
+            echo $exception->getMessage();
+        }
+    }
 }
