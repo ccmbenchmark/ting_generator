@@ -204,6 +204,7 @@ class TableAnalyzer extends atoum
             ->mock($this->logger)
                 ->call('error')
                     ->withIdenticalArguments($queryException->getMessage())
+                        ->once()
         ;
     }
 }
