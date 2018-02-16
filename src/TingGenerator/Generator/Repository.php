@@ -197,7 +197,8 @@ class Repository
     {
         $body =
             '$metadata = new Metadata($serializerFactory);'
-            . "\n" . '$metadata->setEntity(' . $this->formatEntityNamespace($entityFullQualifiedName) . '::class);'
+            . "\n" . '$metadata->setEntity('
+                . $this->stringFormatter->formatEntityNamespace($entityFullQualifiedName) . '::class);'
             . "\n" . '$metadata->setConnectionName($options[\'connection\']);'
             . "\n" . '$metadata->setDatabase($options[\'database\']);'
             . "\n" . '$metadata->setTable(\'' . $tableDescription->getName() . '\');'
@@ -240,21 +241,5 @@ class Repository
         $body .= "\n" . '    ])';
 
         return $body;
-    }
-
-    /**
-     * @param string $entityNamespace
-     *
-     * @return string
-     */
-    private function formatEntityNamespace($entityNamespace)
-    {
-        $entityNamespace = (string) $entityNamespace;
-
-        if (preg_match('~^\/~', $entityNamespace) === 1) {
-            return $entityNamespace;
-        }
-
-        return '\\' . $entityNamespace;
     }
 }

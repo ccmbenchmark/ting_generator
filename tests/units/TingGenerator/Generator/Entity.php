@@ -43,7 +43,7 @@ use Zend\Code\Generator\PropertyGenerator;
 /**
  * Class Entity
  * @package tests\units\CCMBenchmark\TingGenerator\Generator
- * @tags Entity
+ * @tags EntityGenerator
  */
 class Entity extends atoum
 {

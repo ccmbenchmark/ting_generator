@@ -52,4 +52,20 @@ class StringFormatter
 
         return mb_strtoupper($firstChar, $encoding) . $then;
     }
+
+    /**
+     * @param string $entityNamespace
+     *
+     * @return string
+     */
+    public function formatEntityNamespace($entityNamespace)
+    {
+        $entityNamespace = (string) $entityNamespace;
+
+        if (preg_match('~^\/~', $entityNamespace) === 1) {
+            return $entityNamespace;
+        }
+
+        return '\\' . $entityNamespace;
+    }
 }
