@@ -221,7 +221,7 @@ class Repository
      */
     private function getFieldDeclarationForInitMetadataFunction(FieldDescription $fieldDescription)
     {
-        $fieldName = $fieldDescription->getName();
+        $columnName = $fieldDescription->getName();
         $body = "\n" . '    ->addField([';
 
         if ($fieldDescription->isPrimary() === true) {
@@ -233,13 +233,30 @@ class Repository
         }
 
         $body .=
-              "\n" . '        \'fieldName\' => \'' . $fieldName . '\','
-            . "\n" . '        \'columnName\' => \'' . lcfirst($this->stringFormatter->camelize($fieldName)) . '\','
-            . "\n" . '        \'type\' => \'' . $fieldDescription->getType() . '\'';
+              "\n" . '        \'fieldName\' => \'' . lcfirst($this->stringFormatter->camelize($columnName)) . '\','
+            . "\n" . '        \'columnName\' => \'' . $columnName . '\','
+            . "\n" . '        \'type\' => \''
+                . $this->formatFieldNameForRepositoryMetadata($fieldDescription->getType()) . '\'';
 
         $body .= "\n" . '    ])';
 
         return $body;
+    }
+
+    /**
+     * Sample: \Datetime became datetime.
+     *
+     * @param string $fieldType
+     *
+     * @return string
+     */
+    private function formatFieldNameForRepositoryMetadata($fieldType)
+    {
+        $fieldType = trim($fieldType);
+        $fieldType = mb_strtolower($fieldType);
+        $fieldType = preg_replace('~\\\~', '', $fieldType);
+
+        return (string) $fieldType;
     }
 
     /**
