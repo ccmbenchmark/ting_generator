@@ -79,7 +79,6 @@ class ClassWriter
      * @param int $targetDirectoryRight
      *
      * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
-     * @throws \Zend\Code\Generator\Exception\RuntimeException
      *
      * @return bool
      */
