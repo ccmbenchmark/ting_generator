@@ -44,7 +44,7 @@ class ClassWriter
     private $fileGenerator;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
