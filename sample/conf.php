@@ -24,6 +24,10 @@ return [
             return true;
         }
 
+        if ($tableName !== 'test_jvo') {
+            return true;
+        }
+
         return false;
     },
     /**
@@ -42,8 +46,8 @@ return [
     /**
      * Namespaces
      */
-    'entityNamespace'         => 'AppBundle\Domain\Entity',
-    'repositoryNamespace'     => 'AppBundle\Infrastructure\Repository',
+    'entityNamespace'         => 'App\Domain\User\Entity',
+    'repositoryNamespace'     => 'App\Infrastructure\Repository\User',
 
     /**
      * Target directory right

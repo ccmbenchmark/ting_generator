@@ -24,6 +24,7 @@
 
 namespace CCMBenchmark\TingGenerator\FileGeneration;
 
+use CCMBenchmark\TingGenerator\Infrastructure\PSR2Fixer;
 use Psr\Log\LoggerInterface;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\Exception\RuntimeException;
@@ -44,6 +45,11 @@ class ClassWriter
     private $fileGenerator;
 
     /**
+     * @var PSR2Fixer
+     */
+    private $psr2Fixer;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -51,11 +57,13 @@ class ClassWriter
     /**
      * ClassWriter constructor.
      * @param FileGenerator $fileGenerator
+     * @param PSR2Fixer $psr2Fixer
      * @param LoggerInterface $logger
      */
-    public function __construct(FileGenerator $fileGenerator, LoggerInterface $logger)
+    public function __construct(FileGenerator $fileGenerator, PSR2Fixer $psr2Fixer, LoggerInterface $logger)
     {
         $this->baseFileGenerator = $fileGenerator;
+        $this->psr2Fixer = $psr2Fixer;
         $this->logger = $logger;
     }
 
@@ -107,6 +115,10 @@ class ClassWriter
             $this->fileGenerator->write();
         } catch (RuntimeException $exception) {
             $this->logger->error('Unable to write: ' . $filename . '. Error: ' . $exception->getMessage());
+            return false;
+        }
+
+        if ($this->psr2Fixer->fix($filename) === false) {
             return false;
         }
 
