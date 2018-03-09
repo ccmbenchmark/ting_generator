@@ -1,5 +1,5 @@
 {
-  "name": "ccmbenchmark/tinggenerator",
+  "name": "ccmbenchmark/ting_generator",
   "description": "Generate entities and repositories for Ting",
   "autoload": {
     "psr-4": {
