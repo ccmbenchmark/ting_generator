@@ -7,7 +7,7 @@
     }
   },
   "bin": [
-    "bin/application"
+    "bin/ting-generator"
   ],
   "require": {
     "php": ">=5.5",
