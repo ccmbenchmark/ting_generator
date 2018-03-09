@@ -253,12 +253,7 @@ class Entity
     {
         $propertyType = $fieldDescription->getType();
         $propertyName = $this->formatPropertyName($fieldDescription->getName());
-        $getterBody = 'return';
-        if ($this->shouldCastProperty($propertyType) === true) {
-            $getterBody .= ' (' . $propertyType . ')';
-        }
-        $getterBody .= ' $this->' . $propertyName . ';';
-
+        $getterBody = 'return $this->' . $propertyName . ';';
         $methodName = 'get' . $this->stringFormatter->ucfirst($propertyName);
         try {
             $this->classGenerator
