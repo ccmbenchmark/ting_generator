@@ -4,11 +4,11 @@
   "autoload": {
     "psr-4": {
       "CCMBenchmark\\TingGenerator\\": "src/TingGenerator"
-    },
-    "bin": [
-      "bin/application.php"
-    ]
+    }
   },
+  "bin": [
+    "bin/application.php"
+  ],
   "require": {
     "php": ">=5.5",
     "ext-mbstring": "*",
