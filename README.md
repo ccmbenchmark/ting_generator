@@ -6,7 +6,7 @@ Generate entities and repositories for [Ting Datamapper](https://bitbucket.org/c
 
 php application.php ting:generate --conf=FULL_PATH_TO_CONFIGURATION_FILE -vv
 
-sample: php application.php ting:generate --conf=/var/www/ting_generator/sample/conf.php --mode=3 -vv
+sample: php ./bin/ting-generator ting:generate --conf=/var/www/ting_generator/sample/conf.php --mode=3 -vv
 
 There's an sample of configuration file in ./sample/conf.php
 
