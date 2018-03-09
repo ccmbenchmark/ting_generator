@@ -166,16 +166,12 @@ class Entity
     {
         $propertyType = $fieldDescription->getType();
         $propertyTypeForDocBlock = $propertyType;
-        if ($propertyType !== '') {
-            $propertyTypeForDocBlock .= '|null';
-        }
 
         try {
             $this->classGenerator
                 ->addPropertyFromGenerator(
                     PropertyGenerator::fromArray([
                         'name' => lcfirst($this->stringFormatter->camelize($fieldDescription->getName())),
-                        'defaultValue' => null,
                         'visibility' => PropertyGenerator::VISIBILITY_PRIVATE,
                         'docblock' => DocBlockGenerator::fromArray([
                             'tags' => [new GenericTag('var', $propertyTypeForDocBlock)]
