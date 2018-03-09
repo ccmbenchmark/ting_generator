@@ -22,7 +22,18 @@
  *
  **********************************************************************/
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once
+    realpath(
+        dirname($_SERVER['SCRIPT_FILENAME'])
+        . DIRECTORY_SEPARATOR
+        . str_repeat(
+            '..' . DIRECTORY_SEPARATOR,
+            mb_substr_count(
+                preg_replace('#^./#', '', $_SERVER['SCRIPT_FILENAME']),
+                DIRECTORY_SEPARATOR
+            )
+        )
+    ) . '/vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
 use CCMBenchmark\TingGenerator\Command\TingGenerateCommand;
