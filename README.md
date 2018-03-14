@@ -7,7 +7,7 @@ Update operations on entities and repositories are not yet supported.
 
 ## Launch command
 
-php application.php ting:generate --conf=FULL_PATH_TO_CONFIGURATION_FILE -vv
+php ./bin/ting-generator ting:generate --conf=FULL_PATH_TO_CONFIGURATION_FILE -vv
 
 sample: php ./bin/ting-generator ting:generate --conf=/var/www/ting_generator/sample/conf.php --mode=3 -vv
 
