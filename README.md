@@ -131,6 +131,9 @@ For repositories:
 
 ### Write generated files where you want
 
+You scan specify directory where entities and repositories will be created.
+Directories are created on the fly and you can set their chmod.
+
 For entities:
 
 ```
@@ -143,7 +146,7 @@ For repositories:
 'repositoryDirectory'   => '/var/www/ting_generator/generated/AppBundle/Infrastructure/Repository',
 ```
 
-If you want to set the chmod for directories :
+Setting chmod:
 
 ```
 'targetDirectoryRight' => 0777
