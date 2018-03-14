@@ -164,9 +164,6 @@ class Entity
      */
     private function addPropertyToClass(FieldDescription $fieldDescription)
     {
-        $propertyType = $fieldDescription->getType();
-        $propertyTypeForDocBlock = $propertyType;
-
         try {
             $this->classGenerator
                 ->addPropertyFromGenerator(
@@ -174,7 +171,7 @@ class Entity
                         'name' => lcfirst($this->stringFormatter->camelize($fieldDescription->getName())),
                         'visibility' => PropertyGenerator::VISIBILITY_PRIVATE,
                         'docblock' => DocBlockGenerator::fromArray([
-                            'tags' => [new GenericTag('var', $propertyTypeForDocBlock)]
+                            'tags' => [new GenericTag('var', $fieldDescription->getType())]
                         ])
                     ])
                 );
