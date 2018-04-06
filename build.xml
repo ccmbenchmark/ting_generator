@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<project name="auth.ccm.net" default="install">
-    <target name="install">
+<project name="TingGenerator" default="composer_install">
+    <target name="composer_install">
+        <echo msg="Composer install" />
         <exec command="composer install" checkreturn="true" passthru="true"/>
+    </target>
+    <target name="phpcs">
+        <php expression="include('vendor/autoload.php')"/>
+        <phpcodesniffer
+            standard="PSR2"
+            description="Run PSR2 standards over the codebase"
+            showSniffs="true"
+            showWarnings="true"
+            format="full"
+            haltonerror="true"
+            haltonwarning="true">
+            <fileset refid="srcFiles" />
+            <formatter type="full" outfile="php://stdout" />
+            <formatter type="gitblame" outfile="php://stdout" />
+        </phpcodesniffer>
     </target>
 
     <target name="test">
@@ -23,4 +38,8 @@
             </fileset>
         </atoum>
     </target>
+
+    <fileset dir="src" id="srcFiles">
+        <include name="**/*.php" />
+    </fileset>
 </project>

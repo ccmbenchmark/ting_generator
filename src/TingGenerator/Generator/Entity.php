@@ -164,21 +164,14 @@ class Entity
      */
     private function addPropertyToClass(FieldDescription $fieldDescription)
     {
-        $propertyType = $fieldDescription->getType();
-        $propertyTypeForDocBlock = $propertyType;
-        if ($propertyType !== '') {
-            $propertyTypeForDocBlock .= '|null';
-        }
-
         try {
             $this->classGenerator
                 ->addPropertyFromGenerator(
                     PropertyGenerator::fromArray([
                         'name' => lcfirst($this->stringFormatter->camelize($fieldDescription->getName())),
-                        'defaultValue' => null,
                         'visibility' => PropertyGenerator::VISIBILITY_PRIVATE,
                         'docblock' => DocBlockGenerator::fromArray([
-                            'tags' => [new GenericTag('var', $propertyTypeForDocBlock)]
+                            'tags' => [new GenericTag('var', $fieldDescription->getType())]
                         ])
                     ])
                 );
@@ -253,12 +246,7 @@ class Entity
     {
         $propertyType = $fieldDescription->getType();
         $propertyName = $this->formatPropertyName($fieldDescription->getName());
-        $getterBody = 'return';
-        if ($this->shouldCastProperty($propertyType) === true) {
-            $getterBody .= ' (' . $propertyType . ')';
-        }
-        $getterBody .= ' $this->' . $propertyName . ';';
-
+        $getterBody = 'return $this->' . $propertyName . ';';
         $methodName = 'get' . $this->stringFormatter->ucfirst($propertyName);
         try {
             $this->classGenerator

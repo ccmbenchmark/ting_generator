@@ -1,17 +1,21 @@
 {
-  "name": "ccmbenchmark/tinggenerator",
+  "name": "ccmbenchmark/ting_generator",
   "description": "Generate entities and repositories for Ting",
   "autoload": {
     "psr-4": {
       "CCMBenchmark\\TingGenerator\\": "src/TingGenerator"
     }
   },
+  "bin": [
+    "bin/ting-generator"
+  ],
   "require": {
     "php": ">=5.5",
     "ext-mbstring": "*",
     "zendframework/zend-code": "^3.1",
     "symfony/console": "^3.3",
-    "ccmbenchmark/ting": "^3.0"
+    "ccmbenchmark/ting": "^3.0",
+    "squizlabs/php_codesniffer": "^2.9"
   },
   "require-dev": {
     "atoum/atoum": "^3.2",

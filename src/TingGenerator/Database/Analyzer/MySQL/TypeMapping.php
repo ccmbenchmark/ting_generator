@@ -61,7 +61,8 @@ final class TypeMapping implements TypeMapperInterface
     private function isInteger($fieldType)
     {
         return preg_match(
-            '~^(?:tinyint|smallint|mediumint|int|bigint|bit|float|double|decimal)(?:\([0-9]+\))?$~',
+            // @codingStandardsIgnoreLine
+            '~^(?:tinyint|smallint|mediumint|int|bigint|bit|float|double|decimal)(?:\([0-9]+\))?(?: unsigned)?$~',
             $fieldType
         ) === 1;
     }
