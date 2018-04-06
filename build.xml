@@ -4,6 +4,12 @@
         <echo msg="Composer install" />
         <exec command="composer install" checkreturn="true" passthru="true"/>
     </target>
+
+    <target name="check">
+        <phingcall target="phpcs" />
+        <phingcall target="test" />
+    </target>
+
     <target name="phpcs">
         <php expression="include('vendor/autoload.php')"/>
         <phpcodesniffer
