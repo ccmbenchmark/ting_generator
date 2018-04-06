@@ -1,0 +1,10 @@
+image: ccmbenchmark/php5:latest
+
+pipelines:
+  default:
+    - step:
+      caches:
+        - composer
+      script:
+        - phing test
+        - phing phpcs
