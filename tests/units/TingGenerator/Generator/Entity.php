@@ -225,7 +225,7 @@ class Entity extends atoum
                 )
                 ->and($this->calling($this->classGeneratorFactory)->get = $this->classGenerator)
                 ->and($propertyName = lcfirst($this->stringFormatter->camelize($entityDescription->getName())))
-                ->and($getterBody = 'return (' . $type . ') $this->' . $propertyName . ';')
+                ->and($getterBody = 'return $this->' . $propertyName . ';')
                 ->and($this->newTestedInstance($this->classGeneratorFactory, $this->logger, $this->stringFormatter))
                 ->object($this->testedInstance->generateEntityCode($entityName, $namespace, [$entityDescription]))
                     ->isTestedInstance()
