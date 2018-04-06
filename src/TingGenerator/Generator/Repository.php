@@ -259,20 +259,4 @@ class Repository
 
         return (string) $fieldType;
     }
-
-    /**
-     * @param string $entityNamespace
-     *
-     * @return string
-     */
-    private function formatEntityNamespace($entityNamespace)
-    {
-        $entityNamespace = (string) $entityNamespace;
-
-        if (preg_match('~^\/~', $entityNamespace) === 1) {
-            return $entityNamespace;
-        }
-
-        return '\\' . $entityNamespace;
-    }
 }
