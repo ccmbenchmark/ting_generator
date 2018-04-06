@@ -161,10 +161,9 @@ class Entity extends atoum
                             ->withArguments(
                                 PropertyGenerator::fromArray([
                                     'name' => lcfirst($this->stringFormatter->camelize($description->getName())),
-                                    'defaultValue' => null,
                                     'visibility' => PropertyGenerator::VISIBILITY_PRIVATE,
                                     'docblock' => DocBlockGenerator::fromArray([
-                                        'tags' => [new GenericTag('var', $description->getType() . '|null')]
+                                        'tags' => [new GenericTag('var', $description->getType())]
                                     ])
                                 ])
                             )
