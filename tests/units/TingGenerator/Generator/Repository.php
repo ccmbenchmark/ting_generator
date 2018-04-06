@@ -189,8 +189,8 @@ class Repository extends \atoum
             }
 
             $body .=
-                "\n" . '        \'fieldName\' => \'' . $fieldName . '\','
-                . "\n" . '        \'columnName\' => \'' . lcfirst($this->stringFormatter->camelize($fieldName)) . '\','
+                "\n" . '        \'fieldName\' => \'' . lcfirst($this->stringFormatter->camelize($fieldName)) . '\','
+                . "\n" . '        \'columnName\' => \'' . $fieldName . '\','
                 . "\n" . '        \'type\' => \'' . $fieldDescription->getType() . '\'';
 
             $body .= "\n" . '    ])';
