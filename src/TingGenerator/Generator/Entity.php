@@ -44,12 +44,12 @@ class Entity
     /**
      * @var ClassGenerator
      */
-    private $baseClassGenerator;
+    private $classGenerator;
 
     /**
-     * @var ClassGenerator
+     * @var ClassGeneratorFactory
      */
-    private $classGenerator;
+    private $classGeneratorFactory;
 
     /**
      * @var LoggerInterface
@@ -63,16 +63,16 @@ class Entity
 
     /**
      * Generator constructor.
-     * @param ClassGenerator $classGenerator
+     * @param ClassGeneratorFactory $classGeneratorFactory
      * @param LoggerInterface $logger
      * @param StringFormatter $stringFormatter
      */
     public function __construct(
-        ClassGenerator $classGenerator,
+        ClassGeneratorFactory $classGeneratorFactory,
         LoggerInterface $logger,
         StringFormatter $stringFormatter
     ) {
-        $this->baseClassGenerator = $classGenerator;
+        $this->classGeneratorFactory = $classGeneratorFactory;
         $this->logger = $logger;
         $this->stringFormatter = $stringFormatter;
         $this->initializeClassGenerator();
@@ -86,7 +86,7 @@ class Entity
      */
     private function initializeClassGenerator()
     {
-        $this->classGenerator = clone $this->baseClassGenerator;
+        $this->classGenerator = $this->classGeneratorFactory->get();
 
         return $this;
     }

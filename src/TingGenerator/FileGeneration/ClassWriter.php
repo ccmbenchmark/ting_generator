@@ -34,14 +34,9 @@ class ClassWriter
     const DEFAULT_RIGHT = 0777;
 
     /**
-     * @var FileGenerator
+     * @var FileGeneratorFactory
      */
-    private $baseFileGenerator;
-
-    /**
-     * @var FileGenerator
-     */
-    private $fileGenerator;
+    private $fileGeneratorFactory;
 
     /**
      * @var LoggerInterface
@@ -50,26 +45,13 @@ class ClassWriter
 
     /**
      * ClassWriter constructor.
-     * @param FileGenerator $fileGenerator
+     * @param FileGeneratorFactory $fileGeneratorFactory
      * @param LoggerInterface $logger
      */
-    public function __construct(FileGenerator $fileGenerator, LoggerInterface $logger)
+    public function __construct(FileGeneratorFactory $fileGeneratorFactory, LoggerInterface $logger)
     {
-        $this->baseFileGenerator = $fileGenerator;
+        $this->fileGeneratorFactory = $fileGeneratorFactory;
         $this->logger = $logger;
-    }
-
-    /**
-     * FileGenerator object must be cleaned before each write.
-     * Else it could write a class written previously.
-     *
-     * @return $this
-     */
-    private function initializeFileGenerator()
-    {
-        $this->fileGenerator = clone $this->baseFileGenerator;
-
-        return $this;
     }
 
     /**
@@ -88,7 +70,7 @@ class ClassWriter
         $targetDirectory,
         $targetDirectoryRight = self::DEFAULT_RIGHT
     ) {
-        $this->initializeFileGenerator();
+        $fileGenerator = $this->fileGeneratorFactory->get();
 
         $className = (string) $className;
         $targetDirectory = (string) $targetDirectory;
@@ -100,11 +82,11 @@ class ClassWriter
         }
 
         $filename = $targetDirectory . '/' . $className . '.php';
-        $this->fileGenerator->setFilename($filename);
-        $this->fileGenerator->setClass($classGenerator);
+        $fileGenerator->setFilename($filename);
+        $fileGenerator->setClass($classGenerator);
 
         try {
-            $this->fileGenerator->write();
+            $fileGenerator->write();
         } catch (RuntimeException $exception) {
             $this->logger->error('Unable to write: ' . $filename . '. Error: ' . $exception->getMessage());
             return false;

@@ -75,7 +75,7 @@ final class TypeMapping implements TypeMapperInterface
     private function isString($fieldType)
     {
         return preg_match(
-            '~^(?:char|varchar|tinytext|text|mediumtext|longtext|json|binary|varbinary|tinyblob|'
+            '~^(?:char|varchar|tinytext|text|mediumtext|longtext|binary|varbinary|tinyblob|'
                 . 'blob|mediumblob|longblob|enum|set)(?:\([0-9]+\))?$~',
             $fieldType
         ) === 1;
@@ -86,7 +86,7 @@ final class TypeMapping implements TypeMapperInterface
      *
      * @return bool Return true if $fieldType is a json, false if not.
      */
-    public function isJson($fieldType)
+    private function isJson($fieldType)
     {
         return preg_match('~^json(?:\([0-9]+\))?$~', $fieldType) === 1;
     }

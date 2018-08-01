@@ -44,9 +44,9 @@ use CCMBenchmark\Ting\Repository\Repository as TingRepository;
 class Repository
 {
     /**
-     * @var ClassGenerator
+     * @var ClassGeneratorFactory
      */
-    private $baseClassGenerator;
+    private $classGeneratorFactory;
 
     /**
      * @var ClassGenerator
@@ -65,16 +65,16 @@ class Repository
 
     /**
      * Generator constructor.
-     * @param ClassGenerator $classGenerator
+     * @param ClassGeneratorFactory $classGeneratorFactory
      * @param LoggerInterface $logger
      * @param StringFormatter $stringFormatter
      */
     public function __construct(
-        ClassGenerator $classGenerator,
+        ClassGeneratorFactory $classGeneratorFactory,
         LoggerInterface $logger,
         StringFormatter $stringFormatter
     ) {
-        $this->baseClassGenerator = $classGenerator;
+        $this->classGeneratorFactory = $classGeneratorFactory;
         $this->logger = $logger;
         $this->stringFormatter = $stringFormatter;
         $this->initializeClassGenerator();
@@ -88,7 +88,7 @@ class Repository
      */
     private function initializeClassGenerator()
     {
-        $this->classGenerator = clone $this->baseClassGenerator;
+        $this->classGenerator = $this->classGeneratorFactory->get();
 
         return $this;
     }
@@ -197,7 +197,8 @@ class Repository
     {
         $body =
             '$metadata = new Metadata($serializerFactory);'
-            . "\n" . '$metadata->setEntity(' . $this->formatEntityNamespace($entityFullQualifiedName) . '::class);'
+            . "\n" . '$metadata->setEntity('
+                . $this->stringFormatter->formatEntityNamespace($entityFullQualifiedName) . '::class);'
             . "\n" . '$metadata->setConnectionName($options[\'connection\']);'
             . "\n" . '$metadata->setDatabase($options[\'database\']);'
             . "\n" . '$metadata->setTable(\'' . $tableDescription->getName() . '\');'
@@ -257,21 +258,5 @@ class Repository
         $fieldType = preg_replace('~\\\~', '', $fieldType);
 
         return (string) $fieldType;
-    }
-
-    /**
-     * @param string $entityNamespace
-     *
-     * @return string
-     */
-    private function formatEntityNamespace($entityNamespace)
-    {
-        $entityNamespace = (string) $entityNamespace;
-
-        if (preg_match('~^\/~', $entityNamespace) === 1) {
-            return $entityNamespace;
-        }
-
-        return '\\' . $entityNamespace;
     }
 }

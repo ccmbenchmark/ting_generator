@@ -4,6 +4,12 @@
         <echo msg="Composer install" />
         <exec command="composer install" checkreturn="true" passthru="true"/>
     </target>
+
+    <target name="check">
+        <phingcall target="phpcs" />
+        <phingcall target="test" />
+    </target>
+
     <target name="phpcs">
         <php expression="include('vendor/autoload.php')"/>
         <phpcodesniffer
@@ -18,6 +24,25 @@
             <formatter type="full" outfile="php://stdout" />
             <formatter type="gitblame" outfile="php://stdout" />
         </phpcodesniffer>
+    </target>
+
+    <target name="test">
+        <taskdef name="atoum" classpath="./vendor/atoum/atoum/resources/phing/" classname="AtoumTask"/>
+        <atoum
+                atoumpharpath="./vendor/bin/atoum"
+                bootstrap="./vendor/autoload.php"
+                codecoverage="true"
+                codecoveragereportextensionpath="./tests/coverage/"
+                codecoveragereportextensionurl="file://${fullpath}/tests/coverage/index.html"
+                showcodecoverage="true"
+                showmissingcodecoverage="true"
+                showprogress="true"
+                showmemory="true"
+                showduration="true">
+            <fileset dir="./tests/units">
+                <include name="**/*.php" />
+            </fileset>
+        </atoum>
     </target>
 
     <fileset dir="src" id="srcFiles">
